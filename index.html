@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>조각조각 분수나라</title>
     
     <!-- Tailwind CSS CDN -->
@@ -991,6 +994,8 @@
             // 선택한 섹션 보이기
             const targetSection = document.getElementById(sectionId);
             if (targetSection) {
+                // 디버깅: 섹션 ID 확인 (Netlify 캐시 문제 디버깅용)
+                console.log('섹션 전환:', sectionId, '요소 ID:', targetSection.id, '제목:', targetSection.querySelector('h2')?.textContent);
                 targetSection.classList.add('active');
                 // Section 1로 이동 시 Canvas 다시 그리기
                 if (sectionId === 'section1') {
