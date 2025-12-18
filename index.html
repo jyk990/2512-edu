@@ -330,14 +330,14 @@
                     <p class="text-lg text-white/90">진분수와 가분수를 맞춰 지구를 지켜요!</p>
                 </button>
                 
-                <!-- 메뉴 카드 6: 분수 문장제 문제 도전하기 -->
+                <!-- 메뉴 카드 6: 실전! 문장제 문제 풀기 -->
                 <button 
-                    onclick="showSection('word-problems')" 
+                    onclick="showSection('section6')" 
                     class="menu-card bg-gradient-to-br from-cyan-300 to-cyan-400 rounded-xl p-8 text-left shadow-lg hover:shadow-xl"
                 >
                     <div class="text-5xl mb-4">📝</div>
-                    <h2 class="text-3xl font-bold text-white mb-2">분수 문장제 문제 도전하기</h2>
-                    <p class="text-lg text-white/90">문장제 문제를 풀어봐요!</p>
+                    <h2 class="text-3xl font-bold text-white mb-2">실전! 문장제 문제 풀기</h2>
+                    <p class="text-lg text-white/90">문장제 문제를 풀고 AI 선생님에게 물어봐요!</p>
                 </button>
             </div>
         </div>
@@ -728,6 +728,104 @@
         </div>
     </section>
 
+    <!-- [B] Section 6: 실전! 문장제 문제 풀기 -->
+    <section id="section6" class="section">
+        <div class="container mx-auto px-4 py-8">
+            <!-- 홈으로 버튼 -->
+            <button 
+                onclick="showSection('home')" 
+                class="btn-primary mb-6 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-md"
+            >
+                🏠 홈으로
+            </button>
+            
+            <!-- 제목 -->
+            <h2 class="text-5xl md:text-6xl font-bold text-center text-cyan-600 mb-8">
+                📝 실전! 문장제 문제 풀기
+            </h2>
+            
+            <!-- 콘텐츠 영역 -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 min-h-[600px]">
+                <!-- 문제 생성 버튼 -->
+                <div class="text-center mb-6">
+                    <button 
+                        onclick="generateWordProblem()" 
+                        id="generate-problem-btn"
+                        class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg text-lg transition-all"
+                    >
+                        🎲 새로운 문제 만들기
+                    </button>
+                </div>
+                
+                <!-- 문제 표시 영역 -->
+                <div id="word-problem-area" class="mb-8 hidden">
+                    <div class="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl p-6 md:p-8 shadow-md mb-6">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">문제</h3>
+                        <div id="word-problem-display" class="text-xl md:text-2xl text-gray-700 leading-relaxed flex flex-wrap items-center gap-2">
+                            <!-- 문제가 여기에 표시됨 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 정답 입력 영역 -->
+                    <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 shadow-md mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">정답을 입력하세요</h3>
+                        <div class="flex items-center gap-4 justify-center">
+                            <input 
+                                type="number" 
+                                id="word-problem-answer" 
+                                placeholder="정답"
+                                class="text-3xl font-bold text-center w-32 px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-cyan-500 focus:outline-none"
+                                min="0"
+                            />
+                            <button 
+                                onclick="checkWordProblemAnswer()" 
+                                class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg text-lg"
+                            >
+                                ✅ 정답 확인
+                            </button>
+                        </div>
+                        <div id="word-problem-feedback" class="text-center mt-4 min-h-[40px]">
+                            <!-- 피드백 표시 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI 선생님 챗봇 영역 -->
+                <div id="ai-tutor-area" class="hidden">
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            🤖 AI 선생님에게 힌트 얻기
+                        </h3>
+                        
+                        <!-- 채팅 메시지 영역 -->
+                        <div id="ai-chat-messages" class="bg-white rounded-lg p-4 mb-4 min-h-[200px] max-h-[400px] overflow-y-auto border-2 border-gray-200">
+                            <div class="text-gray-500 text-center py-4">
+                                AI 선생님에게 질문해보세요! 정답 대신 힌트를 알려드립니다.
+                            </div>
+                        </div>
+                        
+                        <!-- 입력 영역 -->
+                        <div class="flex gap-2">
+                            <input 
+                                type="text" 
+                                id="ai-chat-input" 
+                                placeholder="예: 이 문제를 어떻게 풀어야 할까요?"
+                                class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none"
+                                onkeypress="if(event.key === 'Enter') sendAIChatMessage()"
+                            />
+                            <button 
+                                onclick="sendAIChatMessage()" 
+                                class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg"
+                            >
+                                전송
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- JavaScript -->
     <script type="module">
         // ========== 전역 변수 ==========
@@ -868,6 +966,14 @@
                     setTimeout(() => {
                         if (typeof resizeGame3 === 'function') resizeGame3();
                         if (typeof showGame3Intro === 'function') showGame3Intro();
+                    }, 100);
+                }
+                // Section 6로 이동 시 문제 생성
+                if (sectionId === 'section6') {
+                    setTimeout(() => {
+                        if (typeof generateWordProblem === 'function') {
+                            generateWordProblem();
+                        }
                     }, 100);
                 }
             }
@@ -3016,6 +3122,327 @@
             `;
         }
         window.showGame3Intro = showGame3Intro;
+
+        // ========== Section 6: 실전! 문장제 문제 풀기 ==========
+        let section6State = {
+            currentProblem: null,  // 현재 문제 {story_before, numerator, denominator, story_after, answer}
+            chatHistory: []        // AI 챗봇 대화 기록
+        };
+        
+        // 참고용 문제 데이터 (Few-Shot Learning용)
+        const referenceProblems = [
+            "환희는 사과 24개 중에서 1/4를 먹었습니다. 몇 개의 사과를 먹었습니까?",
+            "도서관에 책이 30권 있습니다. 그중 1/5이 동화책입니다. 동화책은 몇 권입니까?",
+            "이로는 케이크를 12조각으로 나누었습니다. 그중 1/3을 먹었습니다. 몇 조각을 먹었습니까?",
+            "학급에 20명의 친구가 있습니다. 그중 1/5가 안경을 씁니다. 안경을 쓰는 친구는 몇 명입니까?",
+            "수희 집의 한 상자에 연필이 18자루 있습니다. 그중 1/6을 형민이에게 나누어 주었습니다. 나누어 준 연필은 몇 자루입니까?",
+            "나율이는 초콜릿 24개 중에서 1/8을 민선이와 나누어 먹었습니다. 몇 개를 먹었습니까?",
+            "도서관에 있는 책 45권 중 1/5가 과학책입니다. 과학책은 몇 권입니까?",
+            "운동장에 있는 학생 27명 중 1/3이 줄넘기를 하고 있습니다. 줄넘기를 하는 학생은 몇 명입니까?",
+            "예린이는 쿠키 16개 중 1/4을 태린이에게 주었습니다. 친구에게 준 쿠키는 몇 개입니까?",
+            "도윤이의 보물상자에 과자 20개가 있습니다. 그중 1/4을 친구들에게 나누어 주었습니다. 나누어 준 과자는 몇 개입니까?"
+        ];
+        
+        // 문제 생성 (OpenAI API)
+        async function generateWordProblem() {
+            const generateBtn = document.getElementById('generate-problem-btn');
+            const problemArea = document.getElementById('word-problem-area');
+            const tutorArea = document.getElementById('ai-tutor-area');
+            const feedback = document.getElementById('word-problem-feedback');
+            const answerInput = document.getElementById('word-problem-answer');
+            
+            if (generateBtn) {
+                generateBtn.disabled = true;
+                generateBtn.textContent = '생성 중...';
+            }
+            
+            const currentAPIKey = API_KEY_FINAL || window.VITE_OPENAI_API_KEY || import.meta.env.VITE_OPENAI_API_KEY;
+            
+            if (!currentAPIKey) {
+                alert('API Key가 설정되지 않았습니다.');
+                if (generateBtn) {
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = '🎲 새로운 문제 만들기';
+                }
+                return;
+            }
+            
+            try {
+                const systemPrompt = `당신은 초등학교 3학년 수학 문제를 만드는 전문가입니다.
+아래 10개의 참고 문제를 보고, 이와 유사한 말투, 소재(사과, 공책, 케이크 등), 난이도로 새로운 문제를 1개 만들어주세요.
+
+**중요 제약 조건:**
+1. 정답은 반드시 자연수(정수)로 딱 떨어져야 합니다.
+2. 분수는 1/2, 1/3, 1/4, 1/5, 1/6, 1/8 중 하나를 사용하세요.
+3. 전체 수량은 분수의 분모로 나누어떨어지는 수여야 합니다.
+
+**참고 문제:**
+${referenceProblems.map((p, i) => `${i + 1}. ${p}`).join('\n')}
+
+**응답 형식 (반드시 JSON만 반환):**
+{
+  "story_before": "철수는 사과 24개 중",
+  "numerator": 1,
+  "denominator": 4,
+  "story_after": "을 먹었습니다. 몇 개를 먹었나요?",
+  "answer": 6
+}
+
+JSON 형식으로만 응답하고, 다른 설명은 포함하지 마세요.`;
+                
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentAPIKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: '위 조건에 맞는 새로운 문제를 1개 만들어주세요. JSON 형식으로만 응답하세요.' }
+                        ],
+                        max_tokens: 300,
+                        temperature: 0.7,
+                        response_format: { type: "json_object" }
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('API 요청 실패');
+                }
+                
+                const data = await response.json();
+                const content = data.choices[0].message.content;
+                
+                // JSON 파싱
+                let problem;
+                try {
+                    problem = JSON.parse(content);
+                } catch (e) {
+                    // JSON이 아닌 경우, JSON 부분만 추출 시도
+                    const jsonMatch = content.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) {
+                        problem = JSON.parse(jsonMatch[0]);
+                    } else {
+                        throw new Error('JSON 형식이 아닙니다.');
+                    }
+                }
+                
+                // 문제 저장
+                section6State.currentProblem = problem;
+                section6State.chatHistory = []; // 새 문제마다 채팅 기록 초기화
+                
+                // 문제 표시
+                displayWordProblem(problem);
+                
+                // 영역 표시
+                if (problemArea) problemArea.classList.remove('hidden');
+                if (tutorArea) tutorArea.classList.remove('hidden');
+                if (feedback) feedback.innerHTML = '';
+                if (answerInput) {
+                    answerInput.value = '';
+                    answerInput.focus();
+                }
+                
+            } catch (error) {
+                console.error('문제 생성 오류:', error);
+                alert(`문제 생성 중 오류가 발생했습니다: ${error.message}`);
+            } finally {
+                if (generateBtn) {
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = '🎲 새로운 문제 만들기';
+                }
+            }
+        }
+        
+        // 문제 표시 (세로 분수 표기)
+        function displayWordProblem(problem) {
+            const display = document.getElementById('word-problem-display');
+            if (!display) return;
+            
+            // 분수 컴포넌트 생성
+            const fractionHTML = `
+                <div class="flex flex-col items-center justify-center mx-1">
+                    <span class="text-2xl md:text-3xl font-semibold">${problem.numerator}</span>
+                    <div class="border-b-2 border-black w-full my-1"></div>
+                    <span class="text-2xl md:text-3xl font-semibold">${problem.denominator}</span>
+                </div>
+            `;
+            
+            // 문제 텍스트와 분수를 조합
+            display.innerHTML = `
+                <span>${problem.story_before}</span>
+                ${fractionHTML}
+                <span>${problem.story_after}</span>
+            `;
+        }
+        
+        // 정답 확인
+        function checkWordProblemAnswer() {
+            if (!section6State.currentProblem) {
+                alert('먼저 문제를 생성해주세요!');
+                return;
+            }
+            
+            const answerInput = document.getElementById('word-problem-answer');
+            const feedback = document.getElementById('word-problem-feedback');
+            
+            if (!answerInput || !feedback) return;
+            
+            const userAnswer = parseInt(answerInput.value);
+            const correctAnswer = section6State.currentProblem.answer;
+            
+            if (isNaN(userAnswer)) {
+                feedback.innerHTML = '<span class="text-red-600">숫자를 입력해주세요!</span>';
+                return;
+            }
+            
+            if (userAnswer === correctAnswer) {
+                feedback.innerHTML = `
+                    <div class="text-4xl font-bold text-green-600 animate-bounce">
+                        🎉 정답입니다!
+                    </div>
+                `;
+            } else {
+                feedback.innerHTML = `
+                    <div class="text-2xl font-bold text-red-600">
+                        🤔 다시 생각해볼까요?
+                    </div>
+                    <div class="text-lg text-gray-600 mt-2">
+                        힌트: AI 선생님에게 물어보세요!
+                    </div>
+                `;
+            }
+        }
+        
+        // AI 챗봇 메시지 전송
+        async function sendAIChatMessage() {
+            if (!section6State.currentProblem) {
+                alert('먼저 문제를 생성해주세요!');
+                return;
+            }
+            
+            const input = document.getElementById('ai-chat-input');
+            const messagesArea = document.getElementById('ai-chat-messages');
+            
+            if (!input || !messagesArea) return;
+            
+            const userMessage = input.value.trim();
+            if (!userMessage) return;
+            
+            // 사용자 메시지 표시
+            addChatMessage('user', userMessage);
+            input.value = '';
+            
+            // AI 응답 대기 표시
+            const loadingId = addChatMessage('assistant', '💭 생각하고 있어요...', true);
+            
+            const currentAPIKey = API_KEY_FINAL || window.VITE_OPENAI_API_KEY || import.meta.env.VITE_OPENAI_API_KEY;
+            
+            if (!currentAPIKey) {
+                updateChatMessage(loadingId, 'assistant', '❌ API Key가 설정되지 않았습니다.');
+                return;
+            }
+            
+            try {
+                const systemPrompt = `당신은 친절한 초등학교 수학 선생님입니다.
+
+**중요 규칙:**
+1. 절대 정답을 바로 알려주지 마세요.
+2. 학생이 스스로 생각할 수 있도록 비유(피자, 그림 그리기 등)를 들어 힌트만 주세요.
+3. 친절하고 격려하는 말투를 사용하세요.
+4. 이모지를 적절히 사용하세요.
+
+**현재 학생이 풀고 있는 문제:**
+${JSON.stringify(section6State.currentProblem, null, 2)}
+
+문제의 정답은 ${section6State.currentProblem.answer}이지만, 절대 이 숫자를 직접 말하지 마세요. 대신 풀이 방법과 힌트를 주세요.`;
+                
+                // 채팅 기록에 추가
+                section6State.chatHistory.push({ role: 'user', content: userMessage });
+                
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentAPIKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            ...section6State.chatHistory.map(msg => ({ role: msg.role, content: msg.content }))
+                        ],
+                        max_tokens: 300,
+                        temperature: 0.7
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('API 요청 실패');
+                }
+                
+                const data = await response.json();
+                const aiMessage = data.choices[0].message.content;
+                
+                // 채팅 기록에 추가
+                section6State.chatHistory.push({ role: 'assistant', content: aiMessage });
+                
+                // 메시지 업데이트
+                updateChatMessage(loadingId, 'assistant', aiMessage);
+                
+            } catch (error) {
+                console.error('AI 챗봇 오류:', error);
+                updateChatMessage(loadingId, 'assistant', `😢 오류가 발생했어요: ${error.message}`);
+            }
+        }
+        
+        // 채팅 메시지 추가
+        function addChatMessage(role, content, isLoading = false) {
+            const messagesArea = document.getElementById('ai-chat-messages');
+            if (!messagesArea) return null;
+            
+            // 초기 안내 메시지 제거
+            if (messagesArea.children.length === 1 && messagesArea.children[0].textContent.includes('AI 선생님에게 질문해보세요')) {
+                messagesArea.innerHTML = '';
+            }
+            
+            const messageId = `chat-msg-${Date.now()}-${Math.random()}`;
+            const messageDiv = document.createElement('div');
+            messageDiv.id = messageId;
+            messageDiv.className = `mb-4 ${role === 'user' ? 'text-right' : 'text-left'}`;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = `inline-block max-w-[80%] px-4 py-2 rounded-xl ${
+                role === 'user' 
+                    ? 'bg-blue-500 text-white' 
+                    : 'bg-gray-200 text-gray-800'
+            }`;
+            bubbleDiv.textContent = content;
+            
+            messageDiv.appendChild(bubbleDiv);
+            messagesArea.appendChild(messageDiv);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+            
+            return messageId;
+        }
+        
+        // 채팅 메시지 업데이트
+        function updateChatMessage(messageId, role, content) {
+            const messageDiv = document.getElementById(messageId);
+            if (!messageDiv) return;
+            
+            const bubbleDiv = messageDiv.querySelector('div');
+            if (bubbleDiv) {
+                bubbleDiv.textContent = content;
+            }
+        }
+        
+        // 전역 함수로 내보내기
+        window.generateWordProblem = generateWordProblem;
+        window.checkWordProblemAnswer = checkWordProblemAnswer;
+        window.sendAIChatMessage = sendAIChatMessage;
 
         const game3Keys = {};
         document.addEventListener('keydown', e => {
