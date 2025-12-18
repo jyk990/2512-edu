@@ -28,7 +28,13 @@
         }
         
         .section.active {
-            display: block;
+            display: block !important;
+        }
+        
+        /* 메인 페이지만 스크롤 없이 */
+        #home.section.active {
+            height: 100vh;
+            overflow: hidden;
         }
         
         .menu-card {
@@ -248,56 +254,58 @@
     </div>
     
     <!-- [A] 메인 화면 (홈) -->
-    <section id="home" class="section active">
-        <div class="container mx-auto px-4 py-12">
-            <div class="text-center mb-12">
-                <h1 class="text-6xl md:text-7xl font-bold text-blue-600 mb-4 drop-shadow-lg">
+    <section id="home" class="section active h-screen flex items-center justify-center overflow-hidden">
+        <div class="w-full h-full flex flex-col items-center justify-center px-4 py-8">
+            <!-- 제목 영역 -->
+            <div class="text-center mb-8 md:mb-12 flex-shrink-0">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-blue-600 mb-2 md:mb-4 drop-shadow-lg">
                     조각조각 분수나라
                 </h1>
-                <p class="text-2xl md:text-3xl text-gray-700 mt-4">
+                <p class="text-lg md:text-2xl lg:text-3xl text-gray-700 mt-2 md:mt-4">
                     재미있게 배우는 분수 탐구
                 </p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-16">
+            <!-- 메뉴 그리드 (화면 공간을 꽉 채우도록) -->
+            <div class="grid grid-cols-2 md:grid-cols-2 gap-4 md:gap-6 w-full max-w-4xl mx-auto flex-1 items-center justify-center">
                 <!-- 메뉴 카드 1: 분수 원리 파헤치기 -->
                 <button 
                     onclick="showSection('section1')" 
-                    class="menu-card bg-gradient-to-br from-pink-300 to-pink-400 rounded-xl p-8 text-left shadow-lg hover:shadow-xl"
+                    class="menu-card bg-gradient-to-br from-pink-300 to-pink-400 rounded-xl p-4 md:p-8 h-full flex flex-col items-center justify-center text-center shadow-lg hover:shadow-xl"
                 >
-                    <div class="text-5xl mb-4">🧐</div>
-                    <h2 class="text-3xl font-bold text-white mb-2">분수 원리 파헤치기</h2>
-                    <p class="text-lg text-white/90">분수가 무엇인지 알아봐요!</p>
+                    <div class="text-4xl md:text-5xl mb-2 md:mb-4">🧐</div>
+                    <h2 class="text-xl md:text-3xl font-bold text-white mb-1 md:mb-2">분수 원리 파헤치기</h2>
+                    <p class="text-sm md:text-lg text-white/90">분수가 무엇인지 알아봐요!</p>
                 </button>
                 
                 <!-- 메뉴 카드 2: 분수 짝꿍 찾기 -->
                 <button 
                     onclick="showSection('section2')" 
-                    class="menu-card bg-gradient-to-br from-purple-300 to-purple-400 rounded-xl p-8 text-left shadow-lg hover:shadow-xl"
+                    class="menu-card bg-gradient-to-br from-purple-300 to-purple-400 rounded-xl p-4 md:p-8 h-full flex flex-col items-center justify-center text-center shadow-lg hover:shadow-xl"
                 >
-                    <div class="text-5xl mb-4">🧩</div>
-                    <h2 class="text-3xl font-bold text-white mb-2">분수 짝꿍 찾기</h2>
-                    <p class="text-lg text-white/90">같은 분수를 찾아봐요!</p>
+                    <div class="text-4xl md:text-5xl mb-2 md:mb-4">🧩</div>
+                    <h2 class="text-xl md:text-3xl font-bold text-white mb-1 md:mb-2">분수 짝꿍 찾기</h2>
+                    <p class="text-sm md:text-lg text-white/90">같은 분수를 찾아봐요!</p>
                 </button>
                 
                 <!-- 메뉴 카드 3: 분수 무한의 계단 -->
                 <button 
                     onclick="showSection('section3')" 
-                    class="menu-card bg-gradient-to-br from-green-300 to-green-400 rounded-xl p-8 text-left shadow-lg hover:shadow-xl"
+                    class="menu-card bg-gradient-to-br from-green-300 to-green-400 rounded-xl p-4 md:p-8 h-full flex flex-col items-center justify-center text-center shadow-lg hover:shadow-xl"
                 >
-                    <div class="text-5xl mb-4">🏃</div>
-                    <h2 class="text-3xl font-bold text-white mb-2">분수 무한의 계단</h2>
-                    <p class="text-lg text-white/90">분수 덧셈을 풀며 계단을 올라가요!</p>
+                    <div class="text-4xl md:text-5xl mb-2 md:mb-4">🏃</div>
+                    <h2 class="text-xl md:text-3xl font-bold text-white mb-1 md:mb-2">분수 무한의 계단</h2>
+                    <p class="text-sm md:text-lg text-white/90">분수 덧셈을 풀며 계단을 올라가요!</p>
                 </button>
                 
                 <!-- 메뉴 카드 4: 지구를 지켜라! 분수 대전쟁 -->
                 <button 
                     onclick="showSection('section4')" 
-                    class="menu-card bg-gradient-to-br from-orange-300 to-orange-400 rounded-xl p-8 text-left shadow-lg hover:shadow-xl"
+                    class="menu-card bg-gradient-to-br from-orange-300 to-orange-400 rounded-xl p-4 md:p-8 h-full flex flex-col items-center justify-center text-center shadow-lg hover:shadow-xl"
                 >
-                    <div class="text-5xl mb-4">⚔️</div>
-                    <h2 class="text-3xl font-bold text-white mb-2">지구를 지켜라! 분수 대전쟁</h2>
-                    <p class="text-lg text-white/90">진분수와 가분수를 맞춰 지구를 지켜요!</p>
+                    <div class="text-4xl md:text-5xl mb-2 md:mb-4">⚔️</div>
+                    <h2 class="text-xl md:text-3xl font-bold text-white mb-1 md:mb-2">지구를 지켜라! 분수 대전쟁</h2>
+                    <p class="text-sm md:text-lg text-white/90">진분수와 가분수를 맞춰 지구를 지켜요!</p>
                 </button>
             </div>
         </div>
@@ -576,6 +584,29 @@
     </section>
 
     <!-- JavaScript -->
+    <!-- showSection 함수를 먼저 정의 (onclick에서 사용하기 위해) -->
+    <script>
+        // 섹션 전환 함수 (전역으로 즉시 사용 가능)
+        function showSection(sectionId) {
+            // 모든 섹션 숨기기
+            const allSections = document.querySelectorAll('.section');
+            allSections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 선택한 섹션 보이기
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                
+                // 각 섹션별 초기화는 모듈 스크립트의 오버라이드된 showSection에서 처리
+                // 여기서는 섹션 전환만 수행
+            }
+        }
+        // 전역으로 노출
+        window.showSection = showSection;
+    </script>
+    
     <script type="module">
         // ========== 전역 변수 ==========
         let numerator = 1;  // 분자
@@ -677,53 +708,56 @@
             }
         }
         
-        // ========== 섹션 전환 함수 ==========
-        function showSection(sectionId) {
-            // 모든 섹션 숨기기
-            const allSections = document.querySelectorAll('.section');
-            allSections.forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // 선택한 섹션 보이기
-            const targetSection = document.getElementById(sectionId);
-            if (targetSection) {
-                targetSection.classList.add('active');
-                // Section 1로 이동 시 Canvas 다시 그리기
-                if (sectionId === 'section1') {
-                    setTimeout(() => {
-                        drawFraction();
-                    }, 100);
-                }
-                // Section 2로 이동 시 게임 초기화
-                if (sectionId === 'section2') {
-                    // 게임이 시작되지 않았다면 초기 상태로
-                    if (typeof game1State !== 'undefined' && !game1State.gameStarted) {
-                        const cardsContainer = document.getElementById('game1-cards');
-                        const successDiv = document.getElementById('game1-success');
-                        const startBtn = document.getElementById('game1-start-btn');
-                        if (cardsContainer) cardsContainer.innerHTML = '';
-                        if (successDiv) successDiv.classList.add('hidden');
-                        if (startBtn) {
-                            startBtn.disabled = false;
-                            startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                        }
+        // ========== 섹션별 초기화 함수 ==========
+        function initSection(sectionId) {
+            // Section 1로 이동 시 Canvas 다시 그리기
+            if (sectionId === 'section1') {
+                setTimeout(() => {
+                    if (typeof drawFraction === 'function') drawFraction();
+                }, 100);
+            }
+            // Section 2로 이동 시 게임 초기화
+            if (sectionId === 'section2') {
+                // 게임이 시작되지 않았다면 초기 상태로
+                if (typeof game1State !== 'undefined' && !game1State.gameStarted) {
+                    const cardsContainer = document.getElementById('game1-cards');
+                    const successDiv = document.getElementById('game1-success');
+                    const startBtn = document.getElementById('game1-start-btn');
+                    if (cardsContainer) cardsContainer.innerHTML = '';
+                    if (successDiv) successDiv.classList.add('hidden');
+                    if (startBtn) {
+                        startBtn.disabled = false;
+                        startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                     }
                 }
-                // Section 3로 이동 시 게임 초기화
-                if (sectionId === 'section3') {
-                    setTimeout(() => {
-                        startGame2();
-                    }, 100);
-                }
-                // Section 4로 이동 시 게임 초기화
-                if (sectionId === 'section4') {
-                    setTimeout(() => {
-                        if (typeof resizeGame3 === 'function') resizeGame3();
-                        if (typeof showGame3Intro === 'function') showGame3Intro();
-                    }, 100);
-                }
             }
+            // Section 3로 이동 시 게임 초기화
+            if (sectionId === 'section3') {
+                setTimeout(() => {
+                    if (typeof startGame2 === 'function') startGame2();
+                }, 100);
+            }
+            // Section 4로 이동 시 게임 초기화
+            if (sectionId === 'section4') {
+                setTimeout(() => {
+                    if (typeof resizeGame3 === 'function') resizeGame3();
+                    if (typeof showGame3Intro === 'function') showGame3Intro();
+                }, 100);
+            }
+        }
+        
+        // 전역 함수로 노출
+        window.initSection = initSection;
+        
+        // showSection 함수 오버라이드 (섹션별 초기화 포함)
+        // 인라인 스크립트의 showSection을 확장하여 initSection 호출 추가
+        if (typeof window.showSection === 'function') {
+            const originalShowSection = window.showSection;
+            window.showSection = function(sectionId) {
+                originalShowSection(sectionId);
+                // 섹션별 초기화 실행
+                initSection(sectionId);
+            };
         }
         
         // ========== 분자 조절 함수 ==========
@@ -987,7 +1021,8 @@
         }
         
         // ========== 전역 함수로 내보내기 (onclick 속성 사용을 위해) ==========
-        window.showSection = showSection;
+        // showSection은 이미 인라인 스크립트에서 정의되었으므로 오버라이드만 수행
+        // window.showSection은 이미 인라인 스크립트에서 설정됨
         window.changeNumerator = changeNumerator;
         window.changeDenominator = changeDenominator;
         window.askAITutor = askAITutor;
