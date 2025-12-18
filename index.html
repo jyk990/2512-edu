@@ -101,10 +101,15 @@
         
         .fraction-line {
             width: 100%;
-            border-bottom: 2.5px solid currentColor;
+            border-bottom: 3px solid currentColor;
             margin: 4px 0;
             min-width: 50px;
             align-self: stretch;
+        }
+        
+        /* 게임 카드 내 분수 선 두께 조정 */
+        #game1-area .fraction-line {
+            border-bottom-width: 4px;
         }
         
         .fraction-denominator {
@@ -152,6 +157,88 @@
             background-color: #f59e0b;
             color: white;
         }
+        
+        /* 카드 뒤집기 게임 스타일 */
+        .card-container {
+            perspective: 1000px;
+            aspect-ratio: 1;
+            min-height: 120px;
+        }
+        
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: rotateY(180deg);
+        }
+        
+        .card-back {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            font-size: 3rem;
+        }
+        
+        .card-back::before {
+            content: '?';
+            color: white;
+            font-weight: bold;
+        }
+        
+        .card.matched .card-front {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        }
+        
+        @keyframes correct {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes incorrect {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .card.correct-animation {
+            animation: correct 0.5s;
+        }
+        
+        .card.incorrect-animation {
+            animation: incorrect 0.5s;
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+        }
     </style>
 </head>
 <body>
@@ -193,24 +280,24 @@
                     <p class="text-lg text-white/90">같은 분수를 찾아봐요!</p>
                 </button>
                 
-                <!-- 메뉴 카드 3: 대분수 변신 달리기 -->
+                <!-- 메뉴 카드 3: 분수 무한의 계단 -->
                 <button 
                     onclick="showSection('section3')" 
                     class="menu-card bg-gradient-to-br from-green-300 to-green-400 rounded-xl p-8 text-left shadow-lg hover:shadow-xl"
                 >
                     <div class="text-5xl mb-4">🏃</div>
-                    <h2 class="text-3xl font-bold text-white mb-2">대분수 변신 달리기</h2>
-                    <p class="text-lg text-white/90">대분수를 가분수로 바꿔봐요!</p>
+                    <h2 class="text-3xl font-bold text-white mb-2">분수 무한의 계단</h2>
+                    <p class="text-lg text-white/90">분수 덧셈을 풀며 계단을 올라가요!</p>
                 </button>
                 
-                <!-- 메뉴 카드 4: 누가 누가 더 클까? -->
+                <!-- 메뉴 카드 4: 지구를 지켜라! 분수 대전쟁 -->
                 <button 
                     onclick="showSection('section4')" 
                     class="menu-card bg-gradient-to-br from-orange-300 to-orange-400 rounded-xl p-8 text-left shadow-lg hover:shadow-xl"
                 >
                     <div class="text-5xl mb-4">⚔️</div>
-                    <h2 class="text-3xl font-bold text-white mb-2">누가 누가 더 클까?</h2>
-                    <p class="text-lg text-white/90">분수 크기를 비교해봐요!</p>
+                    <h2 class="text-3xl font-bold text-white mb-2">지구를 지켜라! 분수 대전쟁</h2>
+                    <p class="text-lg text-white/90">진분수와 가분수를 맞춰 지구를 지켜요!</p>
                 </button>
             </div>
         </div>
@@ -351,16 +438,50 @@
             <!-- 콘텐츠 영역 -->
             <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 min-h-[500px]">
                 <div id="game1-area" class="w-full h-full">
-                    <!-- 카드 뒤집기 게임이 들어갈 영역 -->
-                    <p class="text-center text-gray-500 text-xl mt-20">
-                        카드 뒤집기 게임 영역 (게임이 들어갈 예정)
-                    </p>
+                    <!-- 게임 정보 표시 -->
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex gap-6">
+                            <div class="bg-blue-100 px-4 py-2 rounded-lg">
+                                <span class="text-sm text-gray-600">남은 시간</span>
+                                <div id="game1-timer" class="text-2xl font-bold text-blue-600">--</div>
+                            </div>
+                            <div class="bg-red-100 px-4 py-2 rounded-lg">
+                                <span class="text-sm text-gray-600">틀린 횟수</span>
+                                <div id="game1-errors" class="text-2xl font-bold text-red-600">0</div>
+                            </div>
+                        </div>
+                        <button 
+                            id="game1-start-btn" 
+                            onclick="startGame1()"
+                            class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-6 rounded-xl shadow-md text-lg"
+                        >
+                            게임 시작
+                        </button>
+                    </div>
+                    
+                    <!-- 카드 그리드 -->
+                    <div id="game1-cards" class="grid grid-cols-3 md:grid-cols-4 gap-4 mb-6">
+                        <!-- 카드들이 여기에 동적으로 생성됨 -->
+                    </div>
+                    
+                    <!-- 성공 메시지 -->
+                    <div id="game1-success" class="hidden text-center">
+                        <div class="text-5xl mb-4">🎉</div>
+                        <h3 class="text-3xl font-bold text-green-600 mb-4">성공!</h3>
+                        <p id="game1-result" class="text-xl text-gray-700 mb-6"></p>
+                        <button 
+                            onclick="startGame1()"
+                            class="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold py-3 px-8 rounded-xl shadow-md text-lg"
+                        >
+                            다시 하기
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- [B] Section 3: 대분수 변신 달리기 -->
+    <!-- [B] Section 3: 분수 무한의 계단 -->
     <section id="section3" class="section">
         <div class="container mx-auto px-4 py-8">
             <!-- 홈으로 버튼 -->
@@ -373,22 +494,40 @@
             
             <!-- 제목 -->
             <h2 class="text-5xl md:text-6xl font-bold text-center text-green-600 mb-8">
-                🏃 대분수 변신 달리기
+                🏃 분수 무한의 계단
             </h2>
             
             <!-- 콘텐츠 영역 -->
-            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 min-h-[500px]">
-                <div id="game2-area" class="w-full h-full">
-                    <!-- 횡스크롤 러닝 게임이 들어갈 영역 -->
-                    <p class="text-center text-gray-500 text-xl mt-20">
-                        횡스크롤 러닝 게임 영역 (게임이 들어갈 예정)
-                    </p>
+            <div class="bg-white rounded-2xl shadow-xl p-4 md:p-6 flex justify-center">
+                <div id="game2-container" class="relative" style="max-width: 480px; width: 100%; height: 700px; max-height: 80vh; background-color: #fff; box-shadow: 0 0 20px rgba(0,0,0,0.2); overflow: hidden;">
+                    <canvas id="game2-canvas" style="display: block; width: 100%; height: 100%;"></canvas>
+
+                    <div class="ui-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div class="header" style="padding: 20px; text-align: center; font-family: 'Black Han Sans', sans-serif; text-shadow: 2px 2px 0 #fff;">
+                            <div id="progress-text" style="font-size: 1.2rem; color: #555;">목표: 100계단</div>
+                            <div id="score-board" style="font-size: 3rem; color: #ff6b6b;">0 F</div>
+                        </div>
+                        
+                        <div class="controls" style="padding: 20px; display: flex; justify-content: center; pointer-events: auto; margin-bottom: 30px;">
+                            <button id="climb-btn" style="width: 200px; height: 80px; font-size: 2rem; font-family: 'Black Han Sans', sans-serif; background-color: #4CAF50; color: white; border: none; border-radius: 40px; box-shadow: 0 8px 0 #388E3C; cursor: pointer; transition: transform 0.1s;" onmousedown="this.style.transform='translateY(4px)'; this.style.boxShadow='0 4px 0 #388E3C';" onmouseup="this.style.transform=''; this.style.boxShadow='0 8px 0 #388E3C';" ontouchstart="this.style.transform='translateY(4px)'; this.style.boxShadow='0 4px 0 #388E3C';" ontouchend="this.style.transform=''; this.style.boxShadow='0 8px 0 #388E3C';">오르기!</button>
+                        </div>
+                        
+                        <div id="jump-msg" class="jump-effect" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; font-weight: bold; color: #ffca28; text-shadow: 2px 2px 0 #000; pointer-events: none; display: none;">SUPER JUMP!</div>
+                    </div>
+
+                    <div id="quiz-modal" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); display: none; flex-direction: column; justify-content: center; align-items: center; pointer-events: auto; z-index: 100;">
+                        <div class="quiz-box" style="background-color: white; padding: 30px; border-radius: 20px; width: 80%; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                            <h2 style="margin-top:0; color:#4CAF50;">🧩 분수 퀴즈!</h2>
+                            <div class="quiz-question" id="quiz-content" style="font-size: 2.5rem; margin-bottom: 20px; font-weight: bold; color: #333;"></div>
+                            <div class="options-grid" id="quiz-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- [B] Section 4: 누가 누가 더 클까? -->
+    <!-- [B] Section 4: 지구를 지켜라! 분수 대전쟁 -->
     <section id="section4" class="section">
         <div class="container mx-auto px-4 py-8">
             <!-- 홈으로 버튼 -->
@@ -401,16 +540,36 @@
             
             <!-- 제목 -->
             <h2 class="text-5xl md:text-6xl font-bold text-center text-orange-600 mb-8">
-                ⚔️ 누가 누가 더 클까?
+                ⚔️ 지구를 지켜라! 분수 대전쟁
             </h2>
             
             <!-- 콘텐츠 영역 -->
-            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 min-h-[500px]">
-                <div id="game3-area" class="w-full h-full">
-                    <!-- 부등호 퀴즈 게임이 들어갈 영역 -->
-                    <p class="text-center text-gray-500 text-xl mt-20">
-                        부등호 퀴즈 게임 영역 (게임이 들어갈 예정)
-                    </p>
+            <div class="bg-white rounded-2xl shadow-xl p-4 md:p-6 flex justify-center">
+                <div id="game3-container" class="relative" style="max-width: 600px; width: 100%; height: 100vh; max-height: 80vh; background: linear-gradient(to bottom, #020024 0%, #090979 35%, #00d4ff 100%); overflow: hidden; box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);">
+                    <canvas id="game3-canvas" style="display: block; width: 100%; height: 100%;"></canvas>
+
+                    <div class="ui-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; z-index: 10;">
+                        <div class="hud-top" style="padding: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div class="left-group" style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start;">
+                                <div id="target-badge" class="target-badge badge-proper" style="background-color: #fff; color: #333; padding: 10px 20px; border-radius: 5px; font-family: 'Black Han Sans', sans-serif; font-size: 1.8rem; box-shadow: 3px 3px 0 rgba(0,0,0,0.3); border: 3px solid #333; transition: all 0.3s; text-align: center; min-width: 120px;">진분수</div>
+                                <div class="score-box" style="font-size: 1.2rem; color:#aaa;">STAGE <span id="stage-num">1</span></div>
+                            </div>
+
+                            <div class="info-group" style="display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
+                                <div class="life-box" id="lives" style="font-size: 2rem; color: #ff4757;">❤️❤️❤️</div>
+                                <div class="timer-box" id="timer-box" style="font-family: 'Black Han Sans', sans-serif; font-size: 2.5rem; color: #fff; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 10px; border: 2px solid #fff; margin-top: 10px;">
+                                    ⏳ <span id="timer">60</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="stage-banner" style="position: absolute; top: 20%; left: 50%; transform: translateX(-50%); font-family: 'Black Han Sans', sans-serif; font-size: 4rem; color: rgba(255, 255, 255, 0.2); white-space: nowrap; pointer-events: none; text-shadow: 0 0 10px rgba(255,255,255,0.1);">STAGE 1</div>
+                        <div class="controls-hint" style="position: absolute; bottom: 20px; width: 100%; text-align: center; font-size: 1rem; opacity: 0.7; text-shadow: 1px 1px 0 #000;">PC: 좌우 화살표 / 스페이스바(발사)<br>터치: 화면 좌우 터치 / 중앙 터치(발사)</div>
+                    </div>
+
+                    <div id="screen-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; pointer-events: auto;">
+                        <div class="overlay-content" id="overlay-text" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%;"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -536,6 +695,34 @@
                         drawFraction();
                     }, 100);
                 }
+                // Section 2로 이동 시 게임 초기화
+                if (sectionId === 'section2') {
+                    // 게임이 시작되지 않았다면 초기 상태로
+                    if (typeof game1State !== 'undefined' && !game1State.gameStarted) {
+                        const cardsContainer = document.getElementById('game1-cards');
+                        const successDiv = document.getElementById('game1-success');
+                        const startBtn = document.getElementById('game1-start-btn');
+                        if (cardsContainer) cardsContainer.innerHTML = '';
+                        if (successDiv) successDiv.classList.add('hidden');
+                        if (startBtn) {
+                            startBtn.disabled = false;
+                            startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        }
+                    }
+                }
+                // Section 3로 이동 시 게임 초기화
+                if (sectionId === 'section3') {
+                    setTimeout(() => {
+                        startGame2();
+                    }, 100);
+                }
+                // Section 4로 이동 시 게임 초기화
+                if (sectionId === 'section4') {
+                    setTimeout(() => {
+                        if (typeof resizeGame3 === 'function') resizeGame3();
+                        if (typeof showGame3Intro === 'function') showGame3Intro();
+                    }, 100);
+                }
             }
         }
         
@@ -633,7 +820,6 @@
             
             if (denominator === 0) return;
             
-            const radius = 80;  // 원의 반지름
             const centerX = width / 2;
             const centerY = height / 2;
             
@@ -642,9 +828,35 @@
             const remainder = numerator % denominator;
             const totalCircles = fullCircles + (remainder > 0 ? 1 : 0);
             
-            // 원들이 캔버스 안에 들어가도록 위치 조정
-            const circleSpacing = 180;
-            const startX = centerX - ((totalCircles - 1) * circleSpacing) / 2;
+            // 동적 반지름 계산
+            const defaultRadius = 80;  // 기본 반지름
+            const defaultGap = 20;  // 원들 사이의 기본 간격
+            const padding = 20;  // 양쪽 여백
+            
+            // 필요한 총 너비 계산
+            // 각 원의 지름: radius * 2
+            // 원들 사이의 간격: gap
+            // 총 너비 = (원 개수 * 지름) + (원 개수 - 1) * 간격 + 양쪽 여백
+            const requiredWidth = totalCircles * (defaultRadius * 2) + (totalCircles - 1) * defaultGap + padding * 2;
+            
+            // 반지름과 간격을 동적으로 조정
+            let radius = defaultRadius;
+            let gap = defaultGap;
+            
+            if (requiredWidth > width) {
+                // 공간이 부족하면 비율에 맞춰 줄임
+                const availableWidth = width - padding * 2;
+                const scaleFactor = availableWidth / (requiredWidth - padding * 2);
+                radius = defaultRadius * scaleFactor;
+                gap = defaultGap * scaleFactor;
+            }
+            
+            // 원의 중심 간격 계산 (지름 + 간격)
+            const circleSpacing = radius * 2 + gap;
+            
+            // 중앙 정렬을 위한 시작 X 좌표 계산
+            const totalWidth = totalCircles * (radius * 2) + (totalCircles - 1) * gap;
+            const startX = centerX - totalWidth / 2 + radius;
             
             for (let circleIndex = 0; circleIndex < totalCircles; circleIndex++) {
                 const x = startX + circleIndex * circleSpacing;
@@ -783,6 +995,1133 @@
         window.renderFraction = renderFraction;
         window.renderMixedFraction = renderMixedFraction;
         
+        // ========== Section 2: 카드 뒤집기 게임 ==========
+        let game1State = {
+            cards: [],
+            flippedCards: [],
+            matchedPairs: 0,
+            errors: 0,
+            timer: null,
+            timeLeft: 0,
+            isFlipping: false,
+            gameStarted: false
+        };
+        
+        // 카드용 작은 Canvas에 분수 그리기
+        function drawFractionOnCard(canvas, num, den) {
+            const ctx = canvas.getContext('2d');
+            
+            // Canvas 크기를 카드 크기에 맞게 설정
+            const container = canvas.parentElement;
+            if (container) {
+                const rect = container.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+            }
+            
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // 캔버스 초기화
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+            
+            if (den === 0) return;
+            
+            const centerX = width / 2;
+            const centerY = height / 2;
+            
+            // 가분수 처리: 분자가 분모보다 크면 여러 개의 원 그리기
+            const fullCircles = Math.floor(num / den);
+            const remainder = num % den;
+            const totalCircles = fullCircles + (remainder > 0 ? 1 : 0);
+            
+            // 반지름 극대화: 캔버스 크기의 90% 사용
+            const minDimension = Math.min(width, height);
+            const defaultGap = Math.max(4, minDimension * 0.05);  // 최소 4px, 캔버스 크기의 5%
+            
+            // 최대 반지름 계산: 원들이 들어갈 수 있는 최대 크기
+            let maxRadius;
+            if (totalCircles === 1) {
+                // 원이 1개면 캔버스의 90% 크기
+                maxRadius = minDimension * 0.45;  // 지름이 90%가 되도록
+            } else {
+                // 원이 2개 이상이면 간격을 고려하여 계산
+                const availableWidth = width - (defaultGap * (totalCircles - 1));
+                maxRadius = Math.min(
+                    (availableWidth / totalCircles) / 2,  // 가로 기준
+                    minDimension * 0.45  // 세로 기준
+                );
+            }
+            
+            // 최대 반지름의 90%로 설정 (테두리에 거의 닿을 정도)
+            const radius = maxRadius * 0.9;
+            const gap = defaultGap;
+            
+            // 원의 중심 간격 계산 (지름 + 간격)
+            const circleSpacing = radius * 2 + gap;
+            
+            // 중앙 정렬을 위한 시작 X 좌표 계산
+            const totalWidth = totalCircles * (radius * 2) + (totalCircles - 1) * gap;
+            const startX = centerX - totalWidth / 2 + radius;
+            
+            for (let circleIndex = 0; circleIndex < totalCircles; circleIndex++) {
+                const x = startX + circleIndex * circleSpacing;
+                const y = centerY;
+                
+                let slicesToFill;
+                if (circleIndex < fullCircles) {
+                    slicesToFill = den;
+                } else {
+                    slicesToFill = remainder;
+                }
+                
+                // 원 그리기
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.strokeStyle = '#333333';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // 부채꼴로 등분
+                const anglePerSlice = (2 * Math.PI) / den;
+                
+                for (let i = 0; i < den; i++) {
+                    const startAngle = i * anglePerSlice - Math.PI / 2;
+                    const endAngle = (i + 1) * anglePerSlice - Math.PI / 2;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.arc(x, y, radius, startAngle, endAngle);
+                    ctx.closePath();
+                    
+                    if (i < slicesToFill) {
+                        ctx.fillStyle = i % 2 === 0 ? '#FFB84D' : '#4A90E2';
+                    } else {
+                        ctx.fillStyle = '#F0F0F0';
+                    }
+                    ctx.fill();
+                    
+                    ctx.strokeStyle = '#333333';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        // 게임 데이터 생성
+        function generateGame1Data() {
+            // 분모 배열: 2부터 8까지
+            const denominators = [2, 3, 4, 5, 6, 7, 8];
+            const pairs = [];
+            
+            // 6쌍 생성
+            for (let i = 0; i < 6; i++) {
+                // 분모: 2~8 중 랜덤 선택
+                const den = denominators[Math.floor(Math.random() * denominators.length)];
+                
+                // 분자: 1 이상, 분모×2 이하 (대분수로 바꿨을 때 자연수 부분이 2 이하)
+                const maxNumerator = den * 2;
+                const num = Math.floor(Math.random() * maxNumerator) + 1; // 1부터 den*2까지
+                
+                pairs.push({
+                    id: i,
+                    numerator: num,
+                    denominator: den,
+                    value: num / den  // 비교용
+                });
+            }
+            
+            // 카드 배열 생성 (각 쌍마다 숫자 카드와 그림 카드)
+            const cards = [];
+            pairs.forEach((pair, index) => {
+                // 숫자 카드
+                cards.push({
+                    id: `card-${index * 2}`,
+                    pairId: index,
+                    type: 'number',
+                    numerator: pair.numerator,
+                    denominator: pair.denominator,
+                    value: pair.value
+                });
+                
+                // 그림 카드
+                cards.push({
+                    id: `card-${index * 2 + 1}`,
+                    pairId: index,
+                    type: 'image',
+                    numerator: pair.numerator,
+                    denominator: pair.denominator,
+                    value: pair.value
+                });
+            });
+            
+            // 카드 섞기
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            
+            return cards;
+        }
+        
+        // 카드 HTML 생성
+        function createCardHTML(card, index) {
+            const cardId = `game1-card-${index}`;
+            let frontContent = '';
+            
+            if (card.type === 'number') {
+                // 숫자 카드 - 세로 분수 (크게, 패딩 최소화)
+                frontContent = renderFraction(card.numerator, card.denominator, 'text-3xl md:text-5xl');
+            } else {
+                // 그림 카드 - Canvas (카드 크기에 맞게)
+                frontContent = `<canvas class="fraction-canvas w-full h-full" data-num="${card.numerator}" data-den="${card.denominator}"></canvas>`;
+            }
+            
+            return `
+                <div class="card-container">
+                    <div class="card" id="${cardId}" data-index="${index}" data-pair-id="${card.pairId}" onclick="flipCard(${index})">
+                        <div class="card-front p-1 md:p-2">
+                            ${frontContent}
+                        </div>
+                        <div class="card-back"></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 게임 시작
+        function startGame1() {
+            // 게임 상태 초기화
+            game1State.cards = generateGame1Data();
+            game1State.flippedCards = [];
+            game1State.matchedPairs = 0;
+            game1State.errors = 0;
+            game1State.isFlipping = false;
+            game1State.gameStarted = true;
+            game1State.timeLeft = 120; // 2분
+            
+            // UI 초기화
+            const cardsContainer = document.getElementById('game1-cards');
+            const successDiv = document.getElementById('game1-success');
+            const startBtn = document.getElementById('game1-start-btn');
+            
+            cardsContainer.innerHTML = '';
+            successDiv.classList.add('hidden');
+            startBtn.disabled = true;
+            startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            // 카드 생성
+            game1State.cards.forEach((card, index) => {
+                cardsContainer.innerHTML += createCardHTML(card, index);
+            });
+            
+            // Canvas에 그림 그리기 (카드 크기가 결정된 후)
+            setTimeout(() => {
+                document.querySelectorAll('.fraction-canvas').forEach(canvas => {
+                    const num = parseInt(canvas.dataset.num);
+                    const den = parseInt(canvas.dataset.den);
+                    drawFractionOnCard(canvas, num, den);
+                });
+            }, 200);
+            
+            // 2초간 앞면 보여주기
+            setTimeout(() => {
+                document.querySelectorAll('#game1-cards .card').forEach(cardEl => {
+                    cardEl.classList.add('flipped');
+                });
+                
+                setTimeout(() => {
+                    document.querySelectorAll('#game1-cards .card').forEach(cardEl => {
+                        cardEl.classList.remove('flipped');
+                    });
+                    
+                    // 타이머 시작
+                    startGame1Timer();
+                }, 2000);
+            }, 100);
+            
+            // 에러 카운터 업데이트
+            document.getElementById('game1-errors').textContent = '0';
+        }
+        
+        // 타이머 시작
+        function startGame1Timer() {
+            if (game1State.timer) {
+                clearInterval(game1State.timer);
+            }
+            
+            const timerEl = document.getElementById('game1-timer');
+            timerEl.textContent = formatTime(game1State.timeLeft);
+            
+            game1State.timer = setInterval(() => {
+                game1State.timeLeft--;
+                timerEl.textContent = formatTime(game1State.timeLeft);
+                
+                if (game1State.timeLeft <= 0) {
+                    clearInterval(game1State.timer);
+                    endGame1(false);
+                }
+            }, 1000);
+        }
+        
+        // 시간 포맷팅
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // 카드 뒤집기
+        function flipCard(index) {
+            if (!game1State.gameStarted || game1State.isFlipping) return;
+            
+            const card = game1State.cards[index];
+            const cardEl = document.getElementById(`game1-card-${index}`);
+            
+            // 이미 뒤집혔거나 매칭된 카드는 무시
+            if (cardEl.classList.contains('flipped') || cardEl.classList.contains('matched')) {
+                return;
+            }
+            
+            // 카드 뒤집기
+            cardEl.classList.add('flipped');
+            game1State.flippedCards.push({ index, card });
+            
+            // 두 장이 뒤집혔으면 비교
+            if (game1State.flippedCards.length === 2) {
+                game1State.isFlipping = true;
+                
+                setTimeout(() => {
+                    checkMatch();
+                }, 500);
+            }
+        }
+        
+        // 카드 매칭 확인
+        function checkMatch() {
+            const [first, second] = game1State.flippedCards;
+            const firstCard = game1State.cards[first.index];
+            const secondCard = game1State.cards[second.index];
+            
+            const firstEl = document.getElementById(`game1-card-${first.index}`);
+            const secondEl = document.getElementById(`game1-card-${second.index}`);
+            
+            // 같은 쌍인지 확인 (pairId가 같고, 타입이 다름)
+            if (firstCard.pairId === secondCard.pairId && firstCard.type !== secondCard.type) {
+                // 정답!
+                firstEl.classList.add('matched', 'correct-animation');
+                secondEl.classList.add('matched', 'correct-animation');
+                
+                // 정답 효과
+                showFeedback('딩동댕! 🎉', 'green');
+                
+                game1State.matchedPairs++;
+                
+                // 모든 쌍을 맞췄는지 확인
+                if (game1State.matchedPairs === 6) {
+                    setTimeout(() => {
+                        endGame1(true);
+                    }, 1000);
+                }
+            } else {
+                // 오답!
+                game1State.errors++;
+                document.getElementById('game1-errors').textContent = game1State.errors;
+                
+                firstEl.classList.add('incorrect-animation');
+                secondEl.classList.add('incorrect-animation');
+                
+                showFeedback('땡! 😢', 'red');
+                
+                // 1초 후 다시 뒤집기
+                setTimeout(() => {
+                    firstEl.classList.remove('flipped', 'incorrect-animation');
+                    secondEl.classList.remove('flipped', 'incorrect-animation');
+                }, 1000);
+            }
+            
+            // 초기화
+            game1State.flippedCards = [];
+            
+            setTimeout(() => {
+                game1State.isFlipping = false;
+            }, 1200);
+        }
+        
+        // 피드백 표시
+        function showFeedback(message, color) {
+            const feedback = document.createElement('div');
+            feedback.textContent = message;
+            feedback.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-bold z-50 pointer-events-none';
+            feedback.style.color = color === 'green' ? '#10b981' : '#ef4444';
+            feedback.style.animation = 'fadeInOut 1s';
+            feedback.style.textShadow = '0 2px 4px rgba(0,0,0,0.3)';
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                feedback.remove();
+            }, 1000);
+        }
+        
+        // 게임 종료
+        function endGame1(success) {
+            if (game1State.timer) {
+                clearInterval(game1State.timer);
+            }
+            
+            game1State.gameStarted = false;
+            const startBtn = document.getElementById('game1-start-btn');
+            startBtn.disabled = false;
+            startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            
+            if (success) {
+                const successDiv = document.getElementById('game1-success');
+                const resultEl = document.getElementById('game1-result');
+                const timeUsed = 120 - game1State.timeLeft;
+                resultEl.textContent = `틀린 횟수: ${game1State.errors}회, 소요 시간: ${formatTime(timeUsed)}`;
+                successDiv.classList.remove('hidden');
+            } else {
+                alert('시간이 다 되었어요! 다시 도전해보세요!');
+            }
+        }
+        
+        // 전역 함수로 내보내기
+        window.startGame1 = startGame1;
+        window.flipCard = flipCard;
+        
+        // ========== Section 3: 분수 무한의 계단 ==========
+        let game2State = {
+            canvas: null,
+            ctx: null,
+            currentStep: 0,
+            TARGET_STEP: 100,
+            isQuizActive: false,
+            cameraY: 0,
+            charJumpOffset: 0,
+            isJumping: false,
+            animationId: null
+        };
+        
+        // 게임 초기화
+        function initGame2() {
+            const canvas = document.getElementById('game2-canvas');
+            if (!canvas) return;
+            
+            function resize() {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+            
+            game2State.canvas = canvas;
+            game2State.ctx = canvas.getContext('2d');
+        }
+        
+        // 게임 시작
+        function startGame2() {
+            initGame2();
+            
+            game2State.currentStep = 0;
+            game2State.isQuizActive = false;
+            game2State.cameraY = 0;
+            game2State.charJumpOffset = 0;
+            game2State.isJumping = false;
+            
+            const scoreBoard = document.getElementById('score-board');
+            if (scoreBoard) scoreBoard.innerText = '0 F';
+            
+            const quizModal = document.getElementById('quiz-modal');
+            if (quizModal) quizModal.style.display = 'none';
+            
+            draw();
+        }
+        
+        // 그리기 함수
+        function draw() {
+            const ctx = game2State.ctx;
+            const canvas = game2State.canvas;
+            if (!ctx || !canvas) return;
+            
+            ctx.fillStyle = "#E0F7FA";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2 + 100;
+
+            // 계단 그리기
+            ctx.fillStyle = "#8D6E63";
+            ctx.strokeStyle = "#5D4037";
+            const visibleSteps = 15;
+            const stepWidth = 60;
+            const stepHeight = 40;
+
+            for (let i = game2State.currentStep - 5; i < game2State.currentStep + visibleSteps; i++) {
+                if (i < 0) continue;
+
+                const stepRelIndex = i - game2State.currentStep; 
+                const x = centerX + (stepRelIndex * stepWidth);
+                const y = centerY - (stepRelIndex * stepHeight) + game2State.cameraY;
+
+                ctx.beginPath();
+                ctx.rect(x - stepWidth/2, y, stepWidth, stepHeight);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = "#6D4C41";
+                ctx.beginPath();
+                ctx.rect(x - stepWidth/2, y + stepHeight, stepWidth, stepHeight);
+                ctx.fill();
+                ctx.stroke();
+                
+                ctx.fillStyle = "#8D6E63";
+
+                if (i === 100) {
+                    ctx.fillStyle = "red";
+                    ctx.font = "30px Arial";
+                    ctx.fillText("🚩", x - 15, y - 10);
+                }
+            }
+
+            // 캐릭터 그리기
+            const charScreenX = centerX;
+            const charScreenY = centerY + game2State.cameraY - game2State.charJumpOffset; 
+            
+            ctx.fillStyle = "rgba(0,0,0,0.2)";
+            ctx.beginPath();
+            ctx.ellipse(charScreenX, centerY + stepHeight/2, 20, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "#FF7043";
+            ctx.beginPath();
+            ctx.arc(charScreenX, charScreenY - 20, 25, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(charScreenX - 8, charScreenY - 25, 8, 0, Math.PI * 2);
+            ctx.arc(charScreenX + 8, charScreenY - 25, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = "black";
+            ctx.beginPath();
+            ctx.arc(charScreenX - 8, charScreenY - 25, 3, 0, Math.PI * 2);
+            ctx.arc(charScreenX + 8, charScreenY - 25, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            game2State.animationId = requestAnimationFrame(draw);
+        }
+
+        // 애니메이션 및 게임 로직
+        function animateStep() {
+            if (game2State.isJumping) return;
+            game2State.isJumping = true;
+            
+            let progress = 0;
+            const duration = 150;
+            const startTime = performance.now();
+
+            function loop(time) {
+                const elapsed = time - startTime;
+                progress = Math.min(elapsed / duration, 1);
+                game2State.charJumpOffset = Math.sin(progress * Math.PI) * 40;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(loop);
+                } else {
+                    game2State.isJumping = false;
+                    game2State.charJumpOffset = 0;
+                }
+            }
+            requestAnimationFrame(loop);
+        }
+
+        function climb() {
+            if (game2State.isQuizActive || game2State.currentStep >= game2State.TARGET_STEP) return;
+
+            game2State.currentStep++;
+            const scoreBoard = document.getElementById('score-board');
+            if (scoreBoard) scoreBoard.innerText = `${game2State.currentStep} F`;
+            animateStep();
+
+            if (game2State.currentStep >= game2State.TARGET_STEP) {
+                setTimeout(() => alert("🎉 100계단 정복 성공! 축하합니다! 🎉"), 100);
+                return;
+            }
+
+            if (game2State.currentStep % 5 === 0) {
+                setTimeout(showQuiz, 300);
+            }
+        }
+
+        function superJump(bonusSteps) {
+            const jumpMsg = document.getElementById('jump-msg');
+            if (jumpMsg) {
+                jumpMsg.style.display = 'block';
+                jumpMsg.innerText = `+${bonusSteps} JUMP!`;
+                
+                setTimeout(() => { jumpMsg.style.display = 'none'; }, 1000);
+            }
+
+            let count = 0;
+            const interval = setInterval(() => {
+                game2State.currentStep++;
+                const scoreBoard = document.getElementById('score-board');
+                if (scoreBoard) scoreBoard.innerText = `${game2State.currentStep} F`;
+                animateStep();
+                count++;
+                
+                if (game2State.currentStep >= game2State.TARGET_STEP) {
+                    clearInterval(interval);
+                    setTimeout(() => alert("🎉 100계단 정복 성공! 축하합니다! 🎉"), 500);
+                }
+                
+                if (count >= bonusSteps) clearInterval(interval);
+            }, 200);
+        }
+
+        // 문제 생성기 (분수 덧셈)
+        function generateProblem() {
+            const denom = Math.floor(Math.random() * 8) + 2; 
+            const num1 = Math.floor(Math.random() * (denom - 1)) + 1;
+            const num2 = Math.floor(Math.random() * (denom - 1)) + 1;
+            
+            let ansNum = num1 + num2;
+            let ansDenom = denom;
+            
+            const integer = Math.floor(ansNum / ansDenom);
+            const properNum = ansNum % ansDenom;
+
+            return {
+                q: { n1: num1, n2: num2, d: denom },
+                a: { int: integer, n: properNum, d: ansDenom } 
+            };
+        }
+
+        function fractionToHtml(n, d, int=0) {
+            let html = '<div class="fraction" style="display: inline-block; vertical-align: middle; text-align: center; font-size: 2rem;">';
+            if (int > 0) html += `<span style="font-size:2rem; margin-right:5px;">${int}</span>`;
+            if (n > 0 || int === 0 && n === 0) {
+                 if (n === 0 && int > 0) {
+                     // 정수만 있는 경우
+                 } else {
+                     if (n === 0) { /* 0인 경우 */ }
+                     else {
+                        html += `<div style="display:inline-block; vertical-align:middle;">
+                                    <span style="border-bottom: 3px solid #333; display: block; padding: 0 5px;">${n}</span>
+                                    <span style="display: block; padding: 0 5px;">${d}</span>
+                                </div>`;
+                     }
+                 }
+            }
+            if (int === 0 && n === 0) html += "0";
+            
+            html += '</div>';
+            return html;
+        }
+
+        function showQuiz() {
+            game2State.isQuizActive = true;
+            const quizModal = document.getElementById('quiz-modal');
+            const quizContent = document.getElementById('quiz-content');
+            const quizOptions = document.getElementById('quiz-options');
+            
+            if (!quizModal || !quizContent || !quizOptions) return;
+            
+            quizModal.style.display = 'flex';
+            
+            const problem = generateProblem();
+            
+            const qHtml = `${fractionToHtml(problem.q.n1, problem.q.d)} + ${fractionToHtml(problem.q.n2, problem.q.d)} = ?`;
+            quizContent.innerHTML = qHtml;
+
+            let options = [];
+            
+            options.push({ 
+                html: fractionToHtml(problem.a.n, problem.a.d, problem.a.int), 
+                isCorrect: true 
+            });
+
+            while (options.length < 4) {
+                let wrongNum = problem.q.n1 + problem.q.n2 + Math.floor(Math.random() * 5) - 2;
+                if (wrongNum === problem.q.n1 + problem.q.n2) wrongNum += 1;
+                if (wrongNum <= 0) wrongNum = 1;
+
+                const wInt = Math.floor(wrongNum / problem.q.d);
+                const wN = wrongNum % problem.q.d;
+                
+                const wHtml = fractionToHtml(wN, problem.q.d, wInt);
+                if (!options.some(o => o.html === wHtml)) {
+                    options.push({ html: wHtml, isCorrect: false });
+                }
+            }
+
+            options.sort(() => Math.random() - 0.5);
+
+            quizOptions.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.style.cssText = 'padding: 15px; font-size: 1.5rem; background-color: #FFeb3b; border: 3px solid #FBC02D; border-radius: 10px; cursor: pointer; font-family: Jua, sans-serif;';
+                btn.innerHTML = opt.html;
+                btn.onclick = () => checkAnswer(opt.isCorrect);
+                quizOptions.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(isCorrect) {
+            if (isCorrect) {
+                const quizModal = document.getElementById('quiz-modal');
+                if (quizModal) quizModal.style.display = 'none';
+                game2State.isQuizActive = false;
+                const bonus = Math.floor(Math.random() * 9) + 2; 
+                superJump(bonus);
+            } else {
+                alert("틀렸습니다! 다시 풀어보세요.");
+            }
+        }
+
+        // 이벤트 리스너
+        const climbBtn = document.getElementById('climb-btn');
+        if (climbBtn) {
+            climbBtn.addEventListener('click', climb);
+        }
+        
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !game2State.isQuizActive) climb();
+        });
+        
+        // ========== Section 4: 지구를 지켜라! 분수 대전쟁 ==========
+        const game3Canvas = document.getElementById('game3-canvas');
+        const game3Ctx = game3Canvas?.getContext('2d');
+        const game3LivesEl = document.getElementById('lives');
+        const game3TimerEl = document.getElementById('timer');
+        const game3TimerBox = document.getElementById('timer-box');
+        const game3StageNumEl = document.getElementById('stage-num');
+        const game3Overlay = document.getElementById('screen-overlay');
+        const game3OverlayContent = document.getElementById('overlay-text');
+        const game3TargetBadge = document.getElementById('target-badge');
+        const game3StageBanner = document.getElementById('stage-banner');
+
+        let game3State = {
+            gameRunning: false,
+            lives: 3,
+            frameCount: 0,
+            timeLeft: 60,
+            timerInterval: null,
+            currentLevel: 1,
+            currentTarget: 'proper',
+            stage3SwitchTimer: 0,
+            player: null,
+            bullets: [],
+            enemies: [],
+            particles: []
+        };
+
+        function resizeGame3() {
+            if (!game3Canvas) return;
+            game3Canvas.width = game3Canvas.parentElement.clientWidth;
+            game3Canvas.height = game3Canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeGame3);
+
+        // 플레이어
+        function createPlayer() {
+            return {
+                x: game3Canvas.width / 2,
+                y: game3Canvas.height - 80,
+                width: 50,
+                height: 50,
+                speed: 7,
+                dx: 0,
+                draw() {
+                    game3Ctx.save();
+                    game3Ctx.translate(this.x, this.y);
+                    game3Ctx.fillStyle = "#dfe6e9";
+                    game3Ctx.beginPath();
+                    game3Ctx.moveTo(0, -this.height/2);
+                    game3Ctx.lineTo(-this.width/2, this.height/2);
+                    game3Ctx.lineTo(this.width/2, this.height/2);
+                    game3Ctx.closePath();
+                    game3Ctx.fill();
+                    game3Ctx.fillStyle = "#74b9ff";
+                    game3Ctx.beginPath();
+                    game3Ctx.arc(0, 0, 10, 0, Math.PI*2);
+                    game3Ctx.fill();
+                    game3Ctx.fillStyle = "#ff7675";
+                    game3Ctx.beginPath();
+                    game3Ctx.moveTo(-10, this.height/2);
+                    game3Ctx.lineTo(0, this.height/2 + (Math.random()*15 + 5)); 
+                    game3Ctx.lineTo(10, this.height/2);
+                    game3Ctx.fill();
+                    game3Ctx.restore();
+                },
+                update() {
+                    this.x += this.dx;
+                    if (this.x < this.width/2) this.x = this.width/2;
+                    if (this.x > game3Canvas.width - this.width/2) this.x = game3Canvas.width - this.width/2;
+                }
+            };
+        }
+
+        // 총알
+        class Bullet {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.speed = 10;
+                this.radius = 5;
+            }
+            draw() {
+                game3Ctx.fillStyle = "#ffeaa7";
+                game3Ctx.beginPath();
+                game3Ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+                game3Ctx.fill();
+            }
+            update() {
+                this.y -= this.speed;
+            }
+        }
+
+        // 적 (분수 운석)
+        class Enemy {
+            constructor() {
+                this.radius = 35;
+                this.x = Math.random() * (game3Canvas.width - this.radius * 2) + this.radius;
+                this.y = -50;
+                this.speed = Math.random() * 1.5 + 1; 
+                
+                this.denom = Math.floor(Math.random() * 7) + 2; 
+                this.num = Math.floor(Math.random() * (this.denom * 2)) + 1;
+
+                this.text = `${this.num}/${this.denom}`;
+                this.isProper = (this.num < this.denom);
+                this.isImproper = (this.num >= this.denom);
+            }
+
+            draw() {
+                game3Ctx.save();
+                game3Ctx.translate(this.x, this.y);
+                if (this.isImproper) game3Ctx.fillStyle = "#ff6b6b";
+                else game3Ctx.fillStyle = "#00d2d3";
+
+                game3Ctx.beginPath();
+                game3Ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                game3Ctx.fill();
+                game3Ctx.strokeStyle = "#fff";
+                game3Ctx.lineWidth = 2;
+                game3Ctx.stroke();
+
+                game3Ctx.fillStyle = "#fff";
+                game3Ctx.font = "bold 20px Arial";
+                game3Ctx.textAlign = "center";
+                game3Ctx.textBaseline = "middle";
+                game3Ctx.beginPath();
+                game3Ctx.moveTo(-15, 0);
+                game3Ctx.lineTo(15, 0);
+                game3Ctx.strokeStyle = "white";
+                game3Ctx.stroke();
+
+                game3Ctx.font = "16px 'Jua'";
+                game3Ctx.fillText(this.num, 0, -12);
+                game3Ctx.fillText(this.denom, 0, 14);
+                game3Ctx.restore();
+            }
+            update() { this.y += this.speed; }
+        }
+
+        // 파티클
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.radius = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 4 - 2;
+                this.speedY = Math.random() * 4 - 2;
+                this.alpha = 1;
+                this.color = color;
+            }
+            draw() {
+                game3Ctx.save();
+                game3Ctx.globalAlpha = this.alpha;
+                game3Ctx.fillStyle = this.color;
+                game3Ctx.beginPath();
+                game3Ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+                game3Ctx.fill();
+                game3Ctx.restore();
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.alpha -= 0.02;
+            }
+        }
+
+        function createExplosion(x, y, color) {
+            for(let i=0; i<15; i++) {
+                game3State.particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function spawnEnemy() {
+            if (game3State.frameCount % 60 === 0) game3State.enemies.push(new Enemy());
+        }
+
+        function updateGameLogic() {
+            if (game3State.currentLevel === 1) {
+                game3State.currentTarget = 'proper';
+                setUiForTarget('proper');
+                game3StageBanner.innerText = "STAGE 1";
+            } else if (game3State.currentLevel === 2) {
+                game3State.currentTarget = 'improper';
+                setUiForTarget('improper');
+                game3StageBanner.innerText = "STAGE 2";
+                game3StageBanner.style.color = "rgba(255, 107, 107, 0.2)";
+            } else if (game3State.currentLevel === 3) {
+                game3StageBanner.innerText = "STAGE 3";
+                game3StageBanner.style.color = "rgba(255, 215, 0, 0.2)";
+                
+                game3State.stage3SwitchTimer++;
+                if (game3State.stage3SwitchTimer > 180) {
+                    toggleTarget();
+                    game3State.stage3SwitchTimer = 0;
+                    game3TargetBadge.style.transform = "scale(1.2)";
+                    setTimeout(() => game3TargetBadge.style.transform = "scale(1)", 200);
+                }
+            }
+        }
+
+        function setUiForTarget(type) {
+            if (type === 'proper') {
+                game3TargetBadge.innerText = "진분수";
+                game3TargetBadge.className = "target-badge badge-proper";
+                game3TargetBadge.style.cssText = "background-color: #00d2d3; color: white; border-color: #01a3a4; padding: 10px 20px; border-radius: 5px; font-family: 'Black Han Sans', sans-serif; font-size: 1.8rem; box-shadow: 3px 3px 0 rgba(0,0,0,0.3); border: 3px solid #01a3a4; transition: all 0.3s; text-align: center; min-width: 120px;";
+            } else {
+                game3TargetBadge.innerText = "가분수";
+                game3TargetBadge.className = "target-badge badge-improper";
+                game3TargetBadge.style.cssText = "background-color: #ff6b6b; color: white; border-color: #ee5253; padding: 10px 20px; border-radius: 5px; font-family: 'Black Han Sans', sans-serif; font-size: 1.8rem; box-shadow: 3px 3px 0 rgba(0,0,0,0.3); border: 3px solid #ee5253; transition: all 0.3s; text-align: center; min-width: 120px;";
+            }
+        }
+
+        function toggleTarget() {
+            if (game3State.currentTarget === 'proper') {
+                game3State.currentTarget = 'improper';
+                setUiForTarget('improper');
+            } else {
+                game3State.currentTarget = 'proper';
+                setUiForTarget('proper');
+            }
+        }
+
+        function checkCollisions() {
+            for (let i = game3State.bullets.length - 1; i >= 0; i--) {
+                for (let j = game3State.enemies.length - 1; j >= 0; j--) {
+                    const b = game3State.bullets[i];
+                    const e = game3State.enemies[j];
+                    const dist = Math.hypot(b.x - e.x, b.y - e.y);
+                    
+                    if (dist < e.radius + b.radius) {
+                        let isCorrectTarget = false;
+                        if (game3State.currentTarget === 'proper' && e.isProper) isCorrectTarget = true;
+                        if (game3State.currentTarget === 'improper' && e.isImproper) isCorrectTarget = true;
+
+                        if (isCorrectTarget) {
+                            createExplosion(e.x, e.y, "#ffd700");
+                        } else {
+                            game3State.lives--;
+                            updateLives();
+                            createExplosion(e.x, e.y, "#ff0000");
+                            game3Canvas.style.transform = "translate(5px, 5px)";
+                            setTimeout(() => game3Canvas.style.transform = "none", 100);
+                        }
+                        game3State.bullets.splice(i, 1);
+                        game3State.enemies.splice(j, 1);
+                        break;
+                    }
+                }
+            }
+            for (let i = game3State.enemies.length - 1; i >= 0; i--) {
+                if (game3State.enemies[i].y > game3Canvas.height + 50) game3State.enemies.splice(i, 1);
+            }
+        }
+
+        function updateLives() {
+            let hearts = "";
+            for(let i=0; i<game3State.lives; i++) hearts += "❤️";
+            game3LivesEl.innerText = hearts;
+            if (game3State.lives <= 0) handleGameOver(false);
+        }
+
+        function runTimer() {
+            game3State.timeLeft = 60;
+            game3TimerEl.innerText = game3State.timeLeft;
+            game3TimerBox.classList.remove('timer-warning');
+
+            if (game3State.timerInterval) clearInterval(game3State.timerInterval);
+            
+            game3State.timerInterval = setInterval(() => {
+                if (!game3State.gameRunning) {
+                    clearInterval(game3State.timerInterval);
+                    return;
+                }
+                game3State.timeLeft--;
+                game3TimerEl.innerText = game3State.timeLeft;
+
+                if (game3State.timeLeft <= 10) game3TimerBox.classList.add('timer-warning');
+
+                if (game3State.timeLeft <= 0) {
+                    handleStageClear();
+                }
+            }, 1000);
+        }
+
+        function gameLoop() {
+            if (!game3State.gameRunning || !game3Ctx || !game3Canvas) return;
+
+            game3Ctx.fillStyle = "rgba(0, 0, 0, 0.3)"; 
+            game3Ctx.fillRect(0, 0, game3Canvas.width, game3Canvas.height);
+            if (Math.random() < 0.1) {
+                game3Ctx.fillStyle = "white";
+                game3Ctx.fillRect(Math.random()*game3Canvas.width, Math.random()*game3Canvas.height, 2, 2);
+            }
+
+            game3State.player.update();
+            game3State.player.draw();
+
+            game3State.bullets.forEach((b, index) => {
+                b.update();
+                b.draw();
+                if (b.y < 0) game3State.bullets.splice(index, 1);
+            });
+
+            spawnEnemy();
+            game3State.enemies.forEach((e) => {
+                e.update();
+                e.draw();
+            });
+
+            game3State.particles.forEach((p, index) => {
+                p.update();
+                p.draw();
+                if (p.alpha <= 0) game3State.particles.splice(index, 1);
+            });
+
+            updateGameLogic(); 
+            checkCollisions();
+            
+            game3State.frameCount++;
+            requestAnimationFrame(gameLoop);
+        }
+
+        function startStage(level) {
+            if (!game3Canvas || !game3Ctx) return;
+            
+            resizeGame3();
+            game3State.gameRunning = true;
+            game3State.currentLevel = level;
+            
+            game3State.lives = 3; 
+            game3State.timeLeft = 60;
+            game3State.enemies = [];
+            game3State.bullets = [];
+            game3State.particles = [];
+            
+            updateLives();
+            game3StageNumEl.innerText = game3State.currentLevel;
+            game3Overlay.style.display = 'none';
+            game3State.player = createPlayer();
+            game3State.player.x = game3Canvas.width / 2;
+
+            if (level === 3) {
+                game3State.stage3SwitchTimer = 0;
+                game3State.currentTarget = 'proper'; 
+            }
+
+            runTimer();
+            gameLoop();
+        }
+        window.startStage = startStage;
+
+        function handleStageClear() {
+            game3State.gameRunning = false;
+            clearInterval(game3State.timerInterval);
+            game3Overlay.style.display = 'flex';
+
+            if (game3State.currentLevel === 1) {
+                game3OverlayContent.innerHTML = `
+                    <h1 style="color:#00d4ff; font-family: 'Black Han Sans', sans-serif; font-size: 3rem; margin-bottom: 20px;">🎉 1단계 성공! 🎉</h1>
+                    <p style="text-align: center; font-size: 1.3rem; margin-bottom: 10px; color: #ccc; line-height: 1.6;">진분수 공격 성공!<br>이제 <strong>가분수</strong>가 몰려옵니다.</p>
+                    <button class="start-btn" onclick="startStage(2)" style="padding: 15px 40px; font-size: 1.8rem; font-family: 'Black Han Sans', sans-serif; background-color: #ff4757; color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 5px 0 #c0392b; transition: transform 0.1s; pointer-events: auto; z-index: 101; margin-top: 20px;">2단계 도전!</button>
+                `;
+            } else if (game3State.currentLevel === 2) {
+                game3OverlayContent.innerHTML = `
+                    <h1 style="color:#ff6b6b; font-family: 'Black Han Sans', sans-serif; font-size: 3rem; margin-bottom: 20px;">🎉 2단계 성공! 🎉</h1>
+                    <p style="text-align: center; font-size: 1.3rem; margin-bottom: 10px; color: #ccc; line-height: 1.6;">가분수 공격 성공!<br>이제 <strong>진분수와 가분수</strong>가<br>번갈아 나옵니다!</p>
+                    <button class="start-btn" onclick="startStage(3)" style="padding: 15px 40px; font-size: 1.8rem; font-family: 'Black Han Sans', sans-serif; background-color: #ff4757; color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 5px 0 #c0392b; transition: transform 0.1s; pointer-events: auto; z-index: 101; margin-top: 20px;">마지막 도전!</button>
+                `;
+            } else {
+                game3OverlayContent.innerHTML = `
+                    <h1 style="color:#ffd700; font-family: 'Black Han Sans', sans-serif; font-size: 3rem; margin-bottom: 20px;">🏆 지구 방위 성공! 🏆</h1>
+                    <p style="text-align: center; font-size: 1.3rem; margin-bottom: 10px; color: #ccc; line-height: 1.6;">모든 분수 공격을 막아냈습니다!<br>당신은 최고의 우주 조종사!</p>
+                    <button class="start-btn" onclick="showGame3Intro()" style="padding: 15px 40px; font-size: 1.8rem; font-family: 'Black Han Sans', sans-serif; background-color: #ff4757; color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 5px 0 #c0392b; transition: transform 0.1s; pointer-events: auto; z-index: 101; margin-top: 20px;">처음으로</button>
+                `;
+            }
+        }
+
+        function handleGameOver() {
+            game3State.gameRunning = false;
+            clearInterval(game3State.timerInterval);
+            game3Overlay.style.display = 'flex';
+            game3OverlayContent.innerHTML = `
+                <h1 style="color:#ff4757; font-family: 'Black Han Sans', sans-serif; font-size: 3rem; margin-bottom: 20px;">💀 게임 오버 💀</h1>
+                <p style="text-align: center; font-size: 1.3rem; margin-bottom: 10px; color: #ccc; line-height: 1.6;">아쉽게 실패했습니다.<br>다시 도전해 볼까요?</p>
+                <button class="start-btn" onclick="startStage(${game3State.currentLevel})" style="padding: 15px 40px; font-size: 1.8rem; font-family: 'Black Han Sans', sans-serif; background-color: #ff4757; color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 5px 0 #c0392b; transition: transform 0.1s; pointer-events: auto; z-index: 101; margin-top: 20px;">재도전</button>
+            `;
+        }
+
+        function showGame3Intro() {
+            game3Overlay.style.display = 'flex';
+            game3OverlayContent.innerHTML = `
+                <h1 style="color:#ffd700; font-family: 'Black Han Sans', sans-serif; font-size: 3rem; margin-bottom: 20px; line-height: 1.2;">지구를 지켜라!<br>분수 대전쟁</h1>
+                <p style="text-align: center; font-size: 1.3rem; margin-bottom: 10px; color: #ccc; line-height: 1.6;">
+                    <strong>총 3단계 미션</strong>을 완료하세요.<br>
+                    <span style="color:#00d4ff">1단계: 진분수</span> / 
+                    <span style="color:#ff6b6b">2단계: 가분수</span> / 
+                    <span style="color:#ffd700">3단계: 혼합</span>
+                </p>
+                <button class="start-btn" onclick="startStage(1)" style="padding: 15px 40px; font-size: 1.8rem; font-family: 'Black Han Sans', sans-serif; background-color: #ff4757; color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 5px 0 #c0392b; transition: transform 0.1s; pointer-events: auto; z-index: 101; margin-top: 20px;">1단계 출격!</button>
+            `;
+        }
+        window.showGame3Intro = showGame3Intro;
+
+        const game3Keys = {};
+        document.addEventListener('keydown', e => {
+            if (!game3State.gameRunning || !game3State.player) return;
+            game3Keys[e.code] = true;
+            if (e.code === 'ArrowLeft') game3State.player.dx = -game3State.player.speed;
+            if (e.code === 'ArrowRight') game3State.player.dx = game3State.player.speed;
+            if (e.code === 'Space') game3State.bullets.push(new Bullet(game3State.player.x, game3State.player.y - 20));
+        });
+        document.addEventListener('keyup', e => {
+            if (!game3State.gameRunning || !game3State.player) return;
+            game3Keys[e.code] = false;
+            if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') game3State.player.dx = 0;
+            if (game3Keys['ArrowLeft']) game3State.player.dx = -game3State.player.speed;
+            if (game3Keys['ArrowRight']) game3State.player.dx = game3State.player.speed;
+        });
+        
+        game3Canvas?.addEventListener('touchstart', e => { e.preventDefault(); handleTouch(e.touches[0].clientX); });
+        game3Canvas?.addEventListener('touchmove', e => { e.preventDefault(); handleTouch(e.touches[0].clientX); });
+        game3Canvas?.addEventListener('touchend', () => { if (game3State.player) game3State.player.dx = 0; });
+        function handleTouch(touchX) {
+            if (!game3State.gameRunning || !game3State.player) return;
+            if (touchX < window.innerWidth / 2 - 50) game3State.player.dx = -game3State.player.speed;
+            else if (touchX > window.innerWidth / 2 + 50) game3State.player.dx = game3State.player.speed; 
+            else game3State.bullets.push(new Bullet(game3State.player.x, game3State.player.y - 20));
+        }
+
         // ========== 초기화 ==========
         document.addEventListener('DOMContentLoaded', async function() {
             showSection('home');
