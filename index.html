@@ -292,7 +292,7 @@
                 
                 <!-- 메뉴 카드 2: 도전 분수 퀴즈! -->
                 <button 
-                    onclick="showSection('quiz')" 
+                    onclick="showSection('section2')" 
                     class="menu-card bg-gradient-to-br from-yellow-300 to-yellow-400 rounded-xl p-8 text-left shadow-lg hover:shadow-xl"
                 >
                     <div class="text-5xl mb-4">🎯</div>
@@ -524,7 +524,7 @@
         </div>
     </section>
 
-    <!-- [B] Section 2: 분수 짝꿍 찾기 -->
+    <!-- [B] Section 2: 도전! 분수 퀴즈 -->
     <section id="section2" class="section">
         <div class="container mx-auto px-4 py-8">
             <!-- 홈으로 버튼 -->
@@ -536,50 +536,98 @@
             </button>
             
             <!-- 제목 -->
-            <h2 class="text-5xl md:text-6xl font-bold text-center text-purple-600 mb-8">
-                🧩 분수 짝꿍 찾기
+            <h2 class="text-5xl md:text-6xl font-bold text-center text-yellow-600 mb-8">
+                🎯 도전! 분수 퀴즈
             </h2>
             
             <!-- 콘텐츠 영역 -->
-            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 min-h-[500px]">
-                <div id="game1-area" class="w-full h-full">
-                    <!-- 게임 정보 표시 -->
-                    <div class="flex justify-between items-center mb-6">
-                        <div class="flex gap-6">
-                            <div class="bg-blue-100 px-4 py-2 rounded-lg">
-                                <span class="text-sm text-gray-600">남은 시간</span>
-                                <div id="game1-timer" class="text-2xl font-bold text-blue-600">--</div>
+            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 min-h-[600px]">
+                <!-- 문제 영역 -->
+                <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 shadow-md text-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-700 mb-4">다음 분수를 만드세요:</h3>
+                    <div id="quiz2-problem-display" class="flex items-center justify-center gap-3 mb-4">
+                        <!-- 문제 분수 표시 (수학책 스타일) -->
+                    </div>
+                    <button 
+                        onclick="generateNewQuiz2Problem()" 
+                        class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold py-2 px-6 rounded-xl shadow-md text-lg"
+                    >
+                        🔄 새로운 문제
+                    </button>
+                </div>
+                
+                <!-- 피드백 영역 -->
+                <div id="quiz2-feedback" class="text-center mb-6 min-h-[60px]">
+                    <!-- 정답/오답 피드백 표시 -->
+                </div>
+                
+                <!-- 분수 조작 영역 (섹션 1 재사용) -->
+                <div id="quiz2-simulation-area" class="w-full h-full">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- 좌측: 조작 패널 -->
+                        <div class="space-y-6">
+                            <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 shadow-md">
+                                <h3 class="text-2xl font-bold text-gray-800 mb-4">분자 (Numerator)</h3>
+                                <div class="flex items-center justify-center gap-4">
+                                    <button 
+                                        onclick="changeQuiz2Numerator(-1)" 
+                                        class="bg-red-400 hover:bg-red-500 text-white font-bold w-12 h-12 rounded-full shadow-md text-xl transition-all"
+                                    >
+                                        -
+                                    </button>
+                                    <span id="quiz2-numerator-display" class="text-4xl font-bold text-gray-800 min-w-[60px] text-center">1</span>
+                                    <button 
+                                        onclick="changeQuiz2Numerator(1)" 
+                                        class="bg-green-400 hover:bg-green-500 text-white font-bold w-12 h-12 rounded-full shadow-md text-xl transition-all"
+                                    >
+                                        +
+                                    </button>
+                                </div>
                             </div>
-                            <div class="bg-red-100 px-4 py-2 rounded-lg">
-                                <span class="text-sm text-gray-600">틀린 횟수</span>
-                                <div id="game1-errors" class="text-2xl font-bold text-red-600">0</div>
+                            
+                            <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 shadow-md">
+                                <h3 class="text-2xl font-bold text-gray-800 mb-4">분모 (Denominator)</h3>
+                                <div class="flex items-center justify-center gap-4">
+                                    <button 
+                                        onclick="changeQuiz2Denominator(-1)" 
+                                        class="bg-red-400 hover:bg-red-500 text-white font-bold w-12 h-12 rounded-full shadow-md text-xl transition-all"
+                                    >
+                                        -
+                                    </button>
+                                    <span id="quiz2-denominator-display" class="text-4xl font-bold text-gray-800 min-w-[60px] text-center">4</span>
+                                    <button 
+                                        onclick="changeQuiz2Denominator(1)" 
+                                        class="bg-green-400 hover:bg-green-500 text-white font-bold w-12 h-12 rounded-full shadow-md text-xl transition-all"
+                                    >
+                                        +
+                                    </button>
+                                </div>
                             </div>
+                            
+                            <!-- 현재 분수 표시 -->
+                            <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 shadow-md text-center">
+                                <h3 class="text-xl font-bold text-gray-700 mb-3">내가 만든 분수</h3>
+                                <div id="quiz2-fraction-display" class="text-5xl font-bold text-blue-600 mb-2 flex justify-center items-center">
+                                    <!-- 세로 분수 형태로 표시됨 -->
+                                </div>
+                                <div id="quiz2-mixed-fraction-display" class="text-2xl text-gray-600 flex justify-center items-center">
+                                    <!-- 대분수 표시 (가분수일 경우) -->
+                                </div>
+                            </div>
+                            
+                            <!-- 정답 확인 버튼 -->
+                            <button 
+                                onclick="checkQuiz2Answer()" 
+                                class="btn-primary w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg text-xl"
+                            >
+                                ✅ 정답 확인
+                            </button>
                         </div>
-                        <button 
-                            id="game1-start-btn" 
-                            onclick="startGame1()"
-                            class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-6 rounded-xl shadow-md text-lg"
-                        >
-                            게임 시작
-                        </button>
-                    </div>
-                    
-                    <!-- 카드 그리드 -->
-                    <div id="game1-cards" class="grid grid-cols-3 md:grid-cols-4 gap-4 mb-6">
-                        <!-- 카드들이 여기에 동적으로 생성됨 -->
-                    </div>
-                    
-                    <!-- 성공 메시지 -->
-                    <div id="game1-success" class="hidden text-center">
-                        <div class="text-5xl mb-4">🎉</div>
-                        <h3 class="text-3xl font-bold text-green-600 mb-4">성공!</h3>
-                        <p id="game1-result" class="text-xl text-gray-700 mb-6"></p>
-                        <button 
-                            onclick="startGame1()"
-                            class="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold py-3 px-8 rounded-xl shadow-md text-lg"
-                        >
-                            다시 하기
-                        </button>
+                        
+                        <!-- 우측: 시각화 영역 -->
+                        <div class="flex items-center justify-center p-4 overflow-auto min-h-[400px]">
+                            <canvas id="quiz2Canvas" width="600" height="600" class="max-w-full h-auto"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -800,20 +848,14 @@
                         drawFraction();
                     }, 100);
                 }
-                // Section 2로 이동 시 게임 초기화
+                // Section 2로 이동 시 퀴즈 초기화
                 if (sectionId === 'section2') {
-                    // 게임이 시작되지 않았다면 초기 상태로
-                    if (typeof game1State !== 'undefined' && !game1State.gameStarted) {
-                        const cardsContainer = document.getElementById('game1-cards');
-                        const successDiv = document.getElementById('game1-success');
-                        const startBtn = document.getElementById('game1-start-btn');
-                        if (cardsContainer) cardsContainer.innerHTML = '';
-                        if (successDiv) successDiv.classList.add('hidden');
-                        if (startBtn) {
-                            startBtn.disabled = false;
-                            startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    // 새로운 문제 생성
+                    setTimeout(() => {
+                        if (typeof generateNewQuiz2Problem === 'function') {
+                            generateNewQuiz2Problem();
                         }
-                    }
+                    }, 100);
                 }
                 // Section 3로 이동 시 게임 초기화
                 if (sectionId === 'section3') {
@@ -1519,19 +1561,374 @@
         window.askQuizHint = askQuizHint;
         
         
-        // ========== Section 2: 카드 뒤집기 게임 ==========
-        let game1State = {
-            cards: [],
-            flippedCards: [],
-            matchedPairs: 0,
-            errors: 0,
-            timer: null,
-            timeLeft: 0,
-            isFlipping: false,
-            gameStarted: false
+        // ========== Section 2: 도전! 분수 퀴즈 ==========
+        let quiz2State = {
+            targetFraction: null,  // 문제 분수 {whole, numerator, denominator, type, value}
+            userNumerator: 1,      // 유저 입력 분자
+            userDenominator: 4,    // 유저 입력 분모
+            quizStatus: 'playing'   // 'playing', 'correct', 'incorrect'
         };
         
-        // 카드용 작은 Canvas에 분수 그리기
+        // 랜덤 분수 문제 생성 (요구사항 준수)
+        function generateQuiz2Problem() {
+            const types = ['proper', 'improper', 'mixed'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            // 분모: 2 이상 10 이하
+            const denominator = Math.floor(Math.random() * 9) + 2;
+            let numerator, whole = 0;
+            
+            if (type === 'proper') {
+                // 진분수: 분자 < 분모
+                numerator = Math.floor(Math.random() * (denominator - 1)) + 1;
+            } else if (type === 'improper') {
+                // 가분수: 분자 >= 분모, 전체 값이 약 5를 넘지 않도록
+                // 분모 * 5 이하로 제한 (자연수 부분이 4 이하)
+                const maxNumerator = Math.min(denominator * 4, denominator * 2 + denominator - 1);
+                numerator = Math.floor(Math.random() * (maxNumerator - denominator + 1)) + denominator;
+            } else {
+                // 대분수: 자연수 0~4, 진분수 조합
+                whole = Math.floor(Math.random() * 5); // 0~4
+                numerator = Math.floor(Math.random() * denominator) + 1; // 1 ~ 분모
+            }
+            
+            // 가분수로 변환 (비교용)
+            const improperNumerator = whole * denominator + numerator;
+            const value = improperNumerator / denominator;
+            
+            return {
+                type: type,
+                whole: whole,
+                numerator: numerator,
+                denominator: denominator,
+                improperNumerator: improperNumerator,
+                value: value
+            };
+        }
+        
+        // 문제를 수학책 스타일로 표시
+        function renderQuiz2Problem(problem) {
+            const container = document.getElementById('quiz2-problem-display');
+            if (!container) return;
+            
+            if (problem.type === 'mixed' && problem.whole > 0) {
+                // 대분수: 자연수 + 분수
+                container.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-5xl md:text-6xl font-bold text-blue-600">${problem.whole}</span>
+                        <div class="flex flex-col items-center">
+                            <span class="text-2xl md:text-3xl font-semibold">${problem.numerator}</span>
+                            <div class="border-b-2 border-black w-full my-1"></div>
+                            <span class="text-2xl md:text-3xl font-semibold">${problem.denominator}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // 가분수 또는 진분수: 분수만
+                container.innerHTML = `
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl md:text-3xl font-semibold">${problem.numerator}</span>
+                        <div class="border-b-2 border-black w-full my-1"></div>
+                        <span class="text-2xl md:text-3xl font-semibold">${problem.denominator}</span>
+                    </div>
+                `;
+            }
+        }
+        
+        // 새로운 문제 생성
+        function generateNewQuiz2Problem() {
+            quiz2State.targetFraction = generateQuiz2Problem();
+            quiz2State.userNumerator = 1;
+            quiz2State.userDenominator = 4;
+            quiz2State.quizStatus = 'playing';
+            
+            // 문제 표시
+            renderQuiz2Problem(quiz2State.targetFraction);
+            
+            // 피드백 초기화
+            const feedback = document.getElementById('quiz2-feedback');
+            if (feedback) {
+                feedback.innerHTML = '';
+            }
+            
+            // UI 업데이트
+            updateQuiz2Display();
+            drawQuiz2Fraction();
+        }
+        
+        // 분자 변경
+        function changeQuiz2Numerator(delta) {
+            quiz2State.userNumerator += delta;
+            if (quiz2State.userNumerator < 0) quiz2State.userNumerator = 0;
+            if (quiz2State.userNumerator > 50) quiz2State.userNumerator = 50; // 상한 설정
+            
+            updateQuiz2Display();
+            drawQuiz2Fraction();
+        }
+        
+        // 분모 변경
+        function changeQuiz2Denominator(delta) {
+            quiz2State.userDenominator += delta;
+            if (quiz2State.userDenominator < 1) quiz2State.userDenominator = 1;
+            if (quiz2State.userDenominator > 10) quiz2State.userDenominator = 10;
+            
+            updateQuiz2Display();
+            drawQuiz2Fraction();
+        }
+        
+        // UI 업데이트
+        function updateQuiz2Display() {
+            // 분자/분모 표시
+            const numDisplay = document.getElementById('quiz2-numerator-display');
+            const denDisplay = document.getElementById('quiz2-denominator-display');
+            if (numDisplay) numDisplay.textContent = quiz2State.userNumerator;
+            if (denDisplay) denDisplay.textContent = quiz2State.userDenominator;
+            
+            // 분수 표시
+            const fractionDisplay = document.getElementById('quiz2-fraction-display');
+            const mixedDisplay = document.getElementById('quiz2-mixed-fraction-display');
+            
+            if (fractionDisplay) {
+                fractionDisplay.innerHTML = renderFraction(quiz2State.userNumerator, quiz2State.userDenominator, 'text-5xl');
+            }
+            
+            if (mixedDisplay) {
+                if (quiz2State.userNumerator >= quiz2State.userDenominator && quiz2State.userDenominator > 0) {
+                    const whole = Math.floor(quiz2State.userNumerator / quiz2State.userDenominator);
+                    const remainder = quiz2State.userNumerator % quiz2State.userDenominator;
+                    if (remainder > 0) {
+                        mixedDisplay.innerHTML = renderMixedFraction(whole, remainder, quiz2State.userDenominator, 'text-2xl');
+                    } else {
+                        mixedDisplay.innerHTML = `<span class="text-2xl">= ${whole}</span>`;
+                    }
+                } else {
+                    mixedDisplay.innerHTML = '';
+                }
+            }
+        }
+        
+        // Canvas에 분수 그리기 (여러 줄 자동 배치 지원)
+        function drawQuiz2Fraction() {
+            const canvas = document.getElementById('quiz2Canvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Canvas 크기 조정 (반응형)
+            const container = canvas.parentElement;
+            let width = 600; // 기본 크기
+            let height = 600;
+            
+            if (container) {
+                const containerRect = container.getBoundingClientRect();
+                const availableWidth = containerRect.width - 32; // padding 고려
+                const availableHeight = containerRect.height - 32;
+                
+                // 컨테이너 크기에 맞게 조정하되, 최소 크기 보장
+                width = Math.max(300, Math.min(availableWidth, 600));
+                height = Math.max(300, Math.min(availableHeight, 600));
+                
+                // Canvas 크기 설정 (내용 보존)
+                if (canvas.width !== width || canvas.height !== height) {
+                    canvas.width = width;
+                    canvas.height = height;
+                }
+            }
+            
+            // 배경 초기화
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+            
+            if (quiz2State.userDenominator === 0) return;
+            
+            // 가분수 처리
+            const fullCircles = Math.floor(quiz2State.userNumerator / quiz2State.userDenominator);
+            const remainder = quiz2State.userNumerator % quiz2State.userDenominator;
+            const totalCircles = fullCircles + (remainder > 0 ? 1 : 0);
+            
+            if (totalCircles === 0) {
+                // 분수가 0인 경우
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const radius = Math.min(width, height) * 0.35;
+                ctx.fillStyle = '#f0f0f0';
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#333333';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                return;
+            }
+            
+            // 원 크기 및 간격 계산
+            const padding = 20; // 컨테이너 여백
+            const gap = 15; // 원 사이 간격
+            const minRadius = 25; // 최소 반지름
+            const maxRadius = Math.min(width, height) * 0.25; // 최대 반지름
+            
+            // 먼저 한 줄로 배치 가능한지 확인
+            const availableWidth = width - padding * 2;
+            const availableHeight = height - padding * 2;
+            
+            // 한 줄에 필요한 최소 너비 계산
+            const minWidthForOneRow = totalCircles * (minRadius * 2) + (totalCircles - 1) * gap;
+            
+            if (minWidthForOneRow <= availableWidth) {
+                // 한 줄로 배치 가능
+                const maxRadiusForOneRow = (availableWidth - (totalCircles - 1) * gap) / (totalCircles * 2);
+                const radius = Math.max(minRadius, Math.min(maxRadiusForOneRow, maxRadius));
+                const circleSpacing = radius * 2 + gap;
+                const totalWidth = totalCircles * (radius * 2) + (totalCircles - 1) * gap;
+                const startX = (width - totalWidth) / 2 + radius;
+                const centerY = height / 2;
+                
+                // 원 그리기 (한 줄)
+                for (let circleIndex = 0; circleIndex < totalCircles; circleIndex++) {
+                    const x = startX + circleIndex * circleSpacing;
+                    const y = centerY;
+                    
+                    let slicesToFill;
+                    if (circleIndex < fullCircles) {
+                        slicesToFill = quiz2State.userDenominator;
+                    } else {
+                        slicesToFill = remainder;
+                    }
+                    
+                    drawCircle(ctx, x, y, radius, slicesToFill, quiz2State.userDenominator);
+                }
+            } else {
+                // 여러 줄로 배치 필요
+                // 한 줄에 들어갈 수 있는 원의 개수 계산
+                let circlesPerRow = Math.floor(availableWidth / (minRadius * 2 + gap));
+                circlesPerRow = Math.max(1, circlesPerRow); // 최소 1개
+                
+                // 줄 수 계산
+                const rows = Math.ceil(totalCircles / circlesPerRow);
+                
+                // 원 크기 계산 (너비와 높이 모두 고려)
+                const maxRadiusByWidth = (availableWidth - (circlesPerRow - 1) * gap) / (circlesPerRow * 2);
+                const maxRadiusByHeight = (availableHeight - (rows - 1) * gap) / (rows * 2);
+                const radius = Math.max(minRadius, Math.min(maxRadiusByWidth, maxRadiusByHeight, maxRadius));
+                
+                const circleSpacing = radius * 2 + gap;
+                const rowSpacing = radius * 2 + gap;
+                
+                // 원 그리기 (여러 줄)
+                for (let circleIndex = 0; circleIndex < totalCircles; circleIndex++) {
+                    const row = Math.floor(circleIndex / circlesPerRow);
+                    const col = circleIndex % circlesPerRow;
+                    
+                    // 현재 줄의 실제 원 개수
+                    const circlesInThisRow = Math.min(circlesPerRow, totalCircles - row * circlesPerRow);
+                    const rowWidth = circlesInThisRow * circleSpacing - gap;
+                    const startX = (width - rowWidth) / 2 + radius;
+                    
+                    const x = startX + col * circleSpacing;
+                    const y = padding + radius + row * rowSpacing;
+                    
+                    let slicesToFill;
+                    if (circleIndex < fullCircles) {
+                        slicesToFill = quiz2State.userDenominator;
+                    } else {
+                        slicesToFill = remainder;
+                    }
+                    
+                    drawCircle(ctx, x, y, radius, slicesToFill, quiz2State.userDenominator);
+                }
+            }
+        }
+        
+        // 원 그리기 헬퍼 함수
+        function drawCircle(ctx, x, y, radius, slicesToFill, denominator) {
+            // 원 테두리
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = '#333333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // 부채꼴로 등분
+            const anglePerSlice = (2 * Math.PI) / denominator;
+            
+            for (let i = 0; i < denominator; i++) {
+                const startAngle = i * anglePerSlice - Math.PI / 2;
+                const endAngle = (i + 1) * anglePerSlice - Math.PI / 2;
+                
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.arc(x, y, radius, startAngle, endAngle);
+                ctx.closePath();
+                
+                if (i < slicesToFill) {
+                    // 색칠된 조각
+                    ctx.fillStyle = i % 2 === 0 ? '#FFB84D' : '#4A90E2';
+                } else {
+                    // 빈 조각
+                    ctx.fillStyle = '#f0f0f0';
+                }
+                ctx.fill();
+                
+                ctx.strokeStyle = '#333333';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+        }
+        
+        // 정답 확인 (값 비교)
+        function checkQuiz2Answer() {
+            if (!quiz2State.targetFraction) {
+                alert('문제를 먼저 생성해주세요!');
+                return;
+            }
+            
+            if (quiz2State.userDenominator === 0) {
+                alert('분모는 0이 될 수 없어요!');
+                return;
+            }
+            
+            // 유저 입력값 계산
+            const userValue = quiz2State.userNumerator / quiz2State.userDenominator;
+            const targetValue = quiz2State.targetFraction.value;
+            
+            // 값 비교 (부동소수점 오차 고려)
+            const tolerance = 0.0001;
+            const isCorrect = Math.abs(userValue - targetValue) < tolerance;
+            
+            // 피드백 표시
+            const feedback = document.getElementById('quiz2-feedback');
+            if (feedback) {
+                if (isCorrect) {
+                    quiz2State.quizStatus = 'correct';
+                    feedback.innerHTML = `
+                        <div class="text-4xl font-bold text-green-600 animate-bounce">
+                            🎉 정답입니다!
+                        </div>
+                    `;
+                } else {
+                    quiz2State.quizStatus = 'incorrect';
+                    feedback.innerHTML = `
+                        <div class="text-4xl font-bold text-red-600">
+                            🤔 다시 생각해볼까요?
+                        </div>
+                        <div class="text-lg text-gray-600 mt-2">
+                            정답: ${quiz2State.targetFraction.whole > 0 ? 
+                                `${quiz2State.targetFraction.whole}과 ${quiz2State.targetFraction.numerator}/${quiz2State.targetFraction.denominator}` :
+                                `${quiz2State.targetFraction.numerator}/${quiz2State.targetFraction.denominator}`}
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // 전역 함수로 내보내기
+        window.generateNewQuiz2Problem = generateNewQuiz2Problem;
+        window.changeQuiz2Numerator = changeQuiz2Numerator;
+        window.changeQuiz2Denominator = changeQuiz2Denominator;
+        window.checkQuiz2Answer = checkQuiz2Answer;
+        
+        // 카드용 작은 Canvas에 분수 그리기 (기존 함수 유지 - 다른 섹션에서 사용 가능)
         function drawFractionOnCard(canvas, num, den) {
             const ctx = canvas.getContext('2d');
             
