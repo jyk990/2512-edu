@@ -260,14 +260,14 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-16">
-                <!-- 메뉴 카드 1: 분수 원리 파헤치기 -->
+                <!-- 메뉴 카드 1: 눈으로 보는 분수 실험실 -->
                 <button 
                     onclick="showSection('section1')" 
                     class="menu-card bg-gradient-to-br from-pink-300 to-pink-400 rounded-xl p-8 text-left shadow-lg hover:shadow-xl"
                 >
                     <div class="text-5xl mb-4">🧐</div>
-                    <h2 class="text-3xl font-bold text-white mb-2">분수 원리 파헤치기</h2>
-                    <p class="text-lg text-white/90">분수가 무엇인지 알아봐요!</p>
+                    <h2 class="text-3xl font-bold text-white mb-2">눈으로 보는 분수 실험실</h2>
+                    <p class="text-lg text-white/90">여러 분수를 직접 만들어봐요</p>
                 </button>
                 
                 <!-- 메뉴 카드 2: 분수 짝꿍 찾기 -->
@@ -303,7 +303,7 @@
         </div>
     </section>
 
-    <!-- [B] Section 1: 분수 원리 파헤치기 -->
+    <!-- [B] Section 1: 눈으로 보는 분수 실험실 -->
     <section id="section1" class="section">
         <div class="container mx-auto px-4 py-8">
             <!-- 홈으로 버튼 -->
@@ -316,12 +316,24 @@
             
             <!-- 제목 -->
             <h2 class="text-5xl md:text-6xl font-bold text-center text-blue-600 mb-8">
-                🧐 분수 원리 파헤치기
+                🧐 눈으로 보는 분수 실험실
             </h2>
             
             <!-- 콘텐츠 영역 -->
             <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 min-h-[600px]">
-                <div id="simulation-area" class="w-full h-full">
+                <!-- 연습 모드 컨테이너 -->
+                <div id="practice-container" class="w-full h-full">
+                    <!-- 퀴즈 모드 전환 버튼 -->
+                    <div class="mb-6 text-center">
+                        <button 
+                            onclick="switchToQuizMode()" 
+                            class="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg text-lg transition-all"
+                        >
+                            🎨 도전! 분수 퀴즈 풀기
+                        </button>
+                    </div>
+                    
+                    <div id="simulation-area" class="w-full h-full">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- 좌측: 조작 패널 -->
                         <div class="space-y-6">
@@ -386,6 +398,59 @@
                         <!-- 우측: 시각화 영역 -->
                         <div class="flex items-center justify-center">
                             <canvas id="fractionCanvas" width="400" height="400" class="max-w-full h-auto"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 퀴즈 모드 컨테이너 -->
+                <div id="quiz-container" class="w-full h-full hidden">
+                    <!-- 연습 모드로 돌아가기 버튼 -->
+                    <div class="mb-6 text-center">
+                        <button 
+                            onclick="switchToPracticeMode()" 
+                            class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg text-lg transition-all"
+                        >
+                            🔙 연습하러 돌아가기
+                        </button>
+                    </div>
+                    
+                    <!-- 퀴즈 문제 영역 -->
+                    <div class="space-y-6">
+                        <!-- 문제 표시 -->
+                        <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 shadow-md text-center">
+                            <h3 class="text-2xl font-bold text-gray-700 mb-4">다음 분수를 만드세요:</h3>
+                            <div id="quiz-problem-display" class="text-6xl font-bold text-blue-600 mb-2 flex justify-center items-center">
+                                <!-- 문제 분수 표시 -->
+                            </div>
+                            <div class="text-lg text-gray-600 mt-2">
+                                문제 <span id="quiz-current-number">1</span> / <span id="quiz-total-number">10</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 힌트 버튼 -->
+                        <div class="text-center">
+                            <button 
+                                onclick="askQuizHint()" 
+                                class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg text-lg"
+                            >
+                                💡 힌트가 필요해요 (AI쌤)
+                            </button>
+                        </div>
+                        
+                        <!-- 퀴즈 Canvas 영역 -->
+                        <div class="flex items-center justify-center bg-gray-50 rounded-xl p-6">
+                            <canvas id="quizCanvas" width="600" height="400" class="max-w-full h-auto cursor-pointer"></canvas>
+                        </div>
+                        
+                        <!-- 제출 버튼 및 피드백 -->
+                        <div class="text-center space-y-4">
+                            <button 
+                                onclick="submitQuizAnswer()" 
+                                class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-xl shadow-lg text-xl"
+                            >
+                                제출하기
+                            </button>
+                            <div id="quiz-feedback" class="text-2xl font-bold min-h-[40px]"></div>
                         </div>
                     </div>
                 </div>
@@ -994,6 +1059,425 @@
         window.closeAIModal = closeAIModal;
         window.renderFraction = renderFraction;
         window.renderMixedFraction = renderMixedFraction;
+        
+        // ========== Section 1: 퀴즈 모드 ==========
+        let quizState = {
+            problems: [], // 10문제 배열
+            currentProblemIndex: 0,
+            selectedPieces: [], // 선택된 조각들 [circleIndex, pieceIndex]
+            totalCorrect: 0,
+            isQuizActive: false
+        };
+        
+        // 퀴즈 문제 생성 (10문제)
+        function generateQuizProblems() {
+            const problems = [];
+            const types = ['proper', 'improper', 'mixed']; // 진분수, 가분수, 대분수
+            
+            for (let i = 0; i < 10; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                let denominator = Math.floor(Math.random() * 9) + 2; // 2~10
+                let numerator, whole = 0;
+                
+                if (type === 'proper') {
+                    // 진분수: 분자 < 분모
+                    numerator = Math.floor(Math.random() * (denominator - 1)) + 1;
+                } else if (type === 'improper') {
+                    // 가분수: 분자 >= 분모, 최대 분자 = 분모 * 2
+                    numerator = Math.floor(Math.random() * denominator) + denominator; // 분모 ~ 분모*2
+                } else {
+                    // 대분수: 자연수 1~3
+                    whole = Math.floor(Math.random() * 3) + 1; // 1~3
+                    numerator = Math.floor(Math.random() * denominator) + 1; // 1 ~ 분모
+                }
+                
+                problems.push({
+                    type: type,
+                    whole: whole,
+                    numerator: numerator,
+                    denominator: denominator,
+                    // 가분수로 변환 (비교용)
+                    improperNumerator: whole * denominator + numerator
+                });
+            }
+            
+            return problems;
+        }
+        
+        // 퀴즈 모드로 전환
+        function switchToQuizMode() {
+            const practiceContainer = document.getElementById('practice-container');
+            const quizContainer = document.getElementById('quiz-container');
+            
+            if (!practiceContainer || !quizContainer) return;
+            
+            // 퀴즈 초기화
+            quizState.problems = generateQuizProblems();
+            quizState.currentProblemIndex = 0;
+            quizState.selectedPieces = [];
+            quizState.totalCorrect = 0;
+            quizState.isQuizActive = true;
+            
+            // 화면 전환
+            practiceContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            
+            // Canvas 클릭 이벤트 리스너 등록
+            setTimeout(() => {
+                const quizCanvas = document.getElementById('quizCanvas');
+                if (quizCanvas) {
+                    // 기존 리스너 제거 후 새로 등록
+                    quizCanvas.removeEventListener('click', handleQuizCanvasClick);
+                    quizCanvas.addEventListener('click', handleQuizCanvasClick);
+                }
+            }, 100);
+            
+            // 첫 문제 표시
+            loadQuizProblem(0);
+        }
+        
+        // 연습 모드로 전환
+        function switchToPracticeMode() {
+            const practiceContainer = document.getElementById('practice-container');
+            const quizContainer = document.getElementById('quiz-container');
+            
+            if (!practiceContainer || !quizContainer) return;
+            
+            quizState.isQuizActive = false;
+            
+            // 화면 전환
+            quizContainer.classList.add('hidden');
+            practiceContainer.classList.remove('hidden');
+        }
+        
+        // 퀴즈 문제 로드
+        function loadQuizProblem(index) {
+            if (index >= quizState.problems.length) {
+                showQuizResult();
+                return;
+            }
+            
+            const problem = quizState.problems[index];
+            quizState.currentProblemIndex = index;
+            quizState.selectedPieces = [];
+            
+            // 문제 표시
+            const problemDisplay = document.getElementById('quiz-problem-display');
+            const currentNumber = document.getElementById('quiz-current-number');
+            const totalNumber = document.getElementById('quiz-total-number');
+            
+            if (problemDisplay) {
+                if (problem.type === 'mixed') {
+                    problemDisplay.innerHTML = renderMixedFraction(problem.whole, problem.numerator, problem.denominator, 'text-6xl');
+                } else {
+                    problemDisplay.innerHTML = renderFraction(problem.numerator, problem.denominator, 'text-6xl');
+                }
+            }
+            
+            if (currentNumber) currentNumber.textContent = index + 1;
+            if (totalNumber) totalNumber.textContent = quizState.problems.length;
+            
+            // 피드백 초기화
+            const feedback = document.getElementById('quiz-feedback');
+            if (feedback) feedback.textContent = '';
+            
+            // Canvas 그리기
+            drawQuizCanvas(problem);
+        }
+        
+        // 퀴즈 Canvas 그리기
+        function drawQuizCanvas(problem) {
+            const canvas = document.getElementById('quizCanvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // 배경 초기화
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = '#f3f4f6';
+            ctx.fillRect(0, 0, width, height);
+            
+            // 필요한 원의 개수 계산 (가분수 기준)
+            const totalPieces = problem.improperNumerator;
+            const piecesPerCircle = problem.denominator;
+            const totalCircles = Math.ceil(totalPieces / piecesPerCircle);
+            
+            // 원 크기 및 간격 계산
+            const padding = 40;
+            const gap = 20;
+            const maxRadius = Math.min((width - padding * 2) / (totalCircles * 2 + (totalCircles - 1) * gap / 50), (height - padding * 2) / 2);
+            const radius = maxRadius * 0.9;
+            
+            // 시작 X 위치 (중앙 정렬)
+            const totalWidth = totalCircles * radius * 2 + (totalCircles - 1) * gap;
+            let startX = (width - totalWidth) / 2 + radius;
+            const centerY = height / 2;
+            
+            // 원 그리기
+            let pieceIndex = 0;
+            for (let circleIdx = 0; circleIdx < totalCircles; circleIdx++) {
+                const centerX = startX + circleIdx * (radius * 2 + gap);
+                const piecesInThisCircle = Math.min(piecesPerCircle, totalPieces - pieceIndex);
+                
+                // 원 테두리
+                ctx.strokeStyle = '#4b5563';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // 조각 나누기
+                for (let i = 0; i < piecesInThisCircle; i++) {
+                    const angle = (Math.PI * 2 * i) / piecesPerCircle;
+                    const nextAngle = (Math.PI * 2 * (i + 1)) / piecesPerCircle;
+                    
+                    // 조각 경계선
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.lineTo(
+                        centerX + Math.cos(angle) * radius,
+                        centerY + Math.sin(angle) * radius
+                    );
+                    ctx.stroke();
+                    
+                    // 선택된 조각 색칠
+                    const isSelected = quizState.selectedPieces.some(
+                        sp => sp[0] === circleIdx && sp[1] === i
+                    );
+                    
+                    if (isSelected) {
+                        ctx.fillStyle = '#f97316'; // 오렌지색
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, centerY);
+                        ctx.arc(centerX, centerY, radius, angle, nextAngle);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+                }
+                
+                pieceIndex += piecesInThisCircle;
+            }
+            
+            // 클릭 영역 저장 (나중에 클릭 감지용)
+            canvas._quizData = {
+                problem: problem,
+                circles: []
+            };
+            
+            pieceIndex = 0;
+            for (let circleIdx = 0; circleIdx < totalCircles; circleIdx++) {
+                const centerX = startX + circleIdx * (radius * 2 + gap);
+                const piecesInThisCircle = Math.min(piecesPerCircle, totalPieces - pieceIndex);
+                canvas._quizData.circles.push({
+                    centerX: centerX,
+                    centerY: centerY,
+                    radius: radius,
+                    pieces: piecesInThisCircle
+                });
+                pieceIndex += piecesInThisCircle;
+            }
+        }
+        
+        // 퀴즈 Canvas 클릭 이벤트
+        function handleQuizCanvasClick(event) {
+            if (!quizState.isQuizActive) return;
+            
+            const canvas = document.getElementById('quizCanvas');
+            if (!canvas || !canvas._quizData) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            const problem = canvas._quizData.problem;
+            const piecesPerCircle = problem.denominator;
+            
+            // 클릭한 조각 찾기
+            for (let circleIdx = 0; circleIdx < canvas._quizData.circles.length; circleIdx++) {
+                const circle = canvas._quizData.circles[circleIdx];
+                const dx = x - circle.centerX;
+                const dy = y - circle.centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance <= circle.radius) {
+                    // 각도 계산
+                    let angle = Math.atan2(dy, dx);
+                    if (angle < 0) angle += Math.PI * 2;
+                    
+                    // 조각 인덱스 계산
+                    const pieceAngle = (Math.PI * 2) / piecesPerCircle;
+                    let pieceIdx = Math.floor(angle / pieceAngle);
+                    if (pieceIdx >= piecesPerCircle) pieceIdx = piecesPerCircle - 1;
+                    
+                    // Toggle 선택
+                    const selectedIndex = quizState.selectedPieces.findIndex(
+                        sp => sp[0] === circleIdx && sp[1] === pieceIdx
+                    );
+                    
+                    if (selectedIndex >= 0) {
+                        // 이미 선택됨 -> 취소
+                        quizState.selectedPieces.splice(selectedIndex, 1);
+                    } else {
+                        // 선택
+                        quizState.selectedPieces.push([circleIdx, pieceIdx]);
+                    }
+                    
+                    // Canvas 다시 그리기
+                    drawQuizCanvas(problem);
+                    break;
+                }
+            }
+        }
+        
+        // 정답 제출
+        function submitQuizAnswer() {
+            const problem = quizState.problems[quizState.currentProblemIndex];
+            const selectedCount = quizState.selectedPieces.length;
+            const correctCount = problem.improperNumerator;
+            
+            const feedback = document.getElementById('quiz-feedback');
+            if (!feedback) return;
+            
+            if (selectedCount === correctCount) {
+                // 정답
+                quizState.totalCorrect++;
+                feedback.textContent = '딩동댕! 🎉';
+                feedback.className = 'text-2xl font-bold min-h-[40px] text-green-600';
+                
+                // 다음 문제로 (1초 후)
+                setTimeout(() => {
+                    loadQuizProblem(quizState.currentProblemIndex + 1);
+                }, 1500);
+            } else {
+                // 오답
+                feedback.textContent = '다시 해볼까요?';
+                feedback.className = 'text-2xl font-bold min-h-[40px] text-red-600';
+            }
+        }
+        
+        // 퀴즈 힌트 (AI)
+        async function askQuizHint() {
+            const problem = quizState.problems[quizState.currentProblemIndex];
+            const currentAPIKey = API_KEY_FINAL || import.meta.env.VITE_OPENAI_API_KEY;
+            
+            if (!currentAPIKey) {
+                alert('API Key가 설정되지 않았습니다.');
+                return;
+            }
+            
+            const modal = document.getElementById('aiModal');
+            const responseDiv = document.getElementById('aiResponse');
+            
+            if (responseDiv) {
+                responseDiv.innerHTML = '<div class="text-center">💭 힌트를 생각하고 있어요...</div>';
+            }
+            
+            modal.classList.add('active');
+            
+            try {
+                const systemPrompt = `너는 초등학생 수학 튜터 '분수 탐험대장'이야.
+말투: 친절, 유쾌, 이모지 사용.
+설명법: '피자'에 비유해서 설명. (분모=피자 조각 수, 분자=먹은 수).
+힌트: 정답을 바로 말하지 말고, 생각할 거리를 줘야 해.
+길이: 1문장.`;
+                
+                let userPrompt = '';
+                if (problem.type === 'mixed') {
+                    userPrompt = `문제는 분모 ${problem.denominator}, 자연수 부분 ${problem.whole}, 분자 ${problem.numerator}야. 아이가 색칠을 어려워해. 피자 조각에 비유해서 정답을 유도하는 힌트를 1문장으로 줘.`;
+                } else {
+                    userPrompt = `문제는 분모 ${problem.denominator}, 분자 ${problem.numerator}야. 아이가 색칠을 어려워해. 피자 조각에 비유해서 정답을 유도하는 힌트를 1문장으로 줘.`;
+                }
+                
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentAPIKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userPrompt }
+                        ],
+                        max_tokens: 150,
+                        temperature: 0.7
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('API 요청 실패');
+                }
+                
+                const data = await response.json();
+                const aiMessage = data.choices[0].message.content;
+                
+                if (responseDiv) {
+                    responseDiv.innerHTML = `<div class="text-lg">${aiMessage}</div>`;
+                }
+                
+            } catch (error) {
+                console.error('AI 힌트 오류:', error);
+                if (responseDiv) {
+                    responseDiv.innerHTML = `
+                        <div class="text-red-500">
+                            😢 오류가 발생했어요: ${error.message}<br>
+                            API Key를 확인하거나 네트워크 연결을 확인해주세요.
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // 퀴즈 결과 표시
+        function showQuizResult() {
+            const quizContainer = document.getElementById('quiz-container');
+            if (!quizContainer) return;
+            
+            const score = quizState.totalCorrect;
+            const total = quizState.problems.length;
+            const percentage = Math.round((score / total) * 100);
+            
+            quizContainer.innerHTML = `
+                <div class="text-center space-y-6 py-12">
+                    <h2 class="text-5xl font-bold text-blue-600 mb-4">🎉 퀴즈 완료!</h2>
+                    <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-8 shadow-lg">
+                        <div class="text-4xl font-bold text-gray-800 mb-4">
+                            정답: ${score} / ${total}
+                        </div>
+                        <div class="text-3xl font-bold text-blue-600 mb-6">
+                            ${percentage}점
+                        </div>
+                        <div class="text-xl text-gray-600 mb-6">
+                            ${percentage >= 80 ? '🌟 훌륭해요! 분수를 정말 잘 이해했어요!' : 
+                              percentage >= 60 ? '👍 잘했어요! 조금만 더 연습하면 완벽해요!' : 
+                              '💪 괜찮아요! 다시 한 번 도전해볼까요?'}
+                        </div>
+                        <button 
+                            onclick="switchToPracticeMode()" 
+                            class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg text-lg transition-all mr-4"
+                        >
+                            🔙 연습하러 가기
+                        </button>
+                        <button 
+                            onclick="switchToQuizMode()" 
+                            class="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg text-lg transition-all"
+                        >
+                            🔄 다시 풀기
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 전역 함수로 내보내기
+        window.switchToQuizMode = switchToQuizMode;
+        window.switchToPracticeMode = switchToPracticeMode;
+        window.submitQuizAnswer = submitQuizAnswer;
+        window.askQuizHint = askQuizHint;
+        
         
         // ========== Section 2: 카드 뒤집기 게임 ==========
         let game1State = {
